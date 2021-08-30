@@ -2,16 +2,16 @@ package cn.widealpha.train.domain;
 
 public class Passenger {
 
-  private long passengerId;
+  private Integer passengerId;
   private String idCardNo;
-  private long student;
+  private Boolean student;
 
 
-  public long getPassengerId() {
+  public Integer getPassengerId() {
     return passengerId;
   }
 
-  public void setPassengerId(long passengerId) {
+  public void setPassengerId(Integer passengerId) {
     this.passengerId = passengerId;
   }
 
@@ -24,13 +24,11 @@ public class Passenger {
     this.idCardNo = idCardNo;
   }
 
-
-  public long getStudent() {
+  public Boolean getStudent() {
     return student;
   }
 
-  public void setStudent(long student) {
+  public void setStudent(Boolean student) {
     this.student = student;
   }
-
 }

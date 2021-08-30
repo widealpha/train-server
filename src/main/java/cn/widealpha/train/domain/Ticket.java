@@ -1,96 +1,103 @@
 package cn.widealpha.train.domain;
 
+import java.math.BigInteger;
+
 public class Ticket {
 
-  private long ticketId;
-  private long coachId;
-  private long seat;
-  private String stationTrainCode;
-  private String startStationTelecode;
-  private String endStationTelecode;
-  private java.sql.Timestamp startTime;
-  private java.sql.Timestamp endTime;
-  private double price;
+    private Integer ticketId;
+    private Integer coachId;
+    private BigInteger seat;
+    private String stationTrainCode;
+    private String startStationTelecode;
+    private String endStationTelecode;
+    private java.sql.Timestamp startTime;
+    private java.sql.Timestamp endTime;
+    private Double price;
+    private Integer passengerId;
+
+    public Integer getTicketId() {
+        return ticketId;
+    }
+
+    public void setTicketId(Integer ticketId) {
+        this.ticketId = ticketId;
+    }
 
 
-  public long getTicketId() {
-    return ticketId;
-  }
+    public Integer getCoachId() {
+        return coachId;
+    }
 
-  public void setTicketId(long ticketId) {
-    this.ticketId = ticketId;
-  }
+    public void setCoachId(Integer coachId) {
+        this.coachId = coachId;
+    }
 
+    public BigInteger getSeat() {
+        return seat;
+    }
 
-  public long getCoachId() {
-    return coachId;
-  }
+    public void setSeat(BigInteger seat) {
+        this.seat = seat;
+    }
 
-  public void setCoachId(long coachId) {
-    this.coachId = coachId;
-  }
+    public String getStationTrainCode() {
+        return stationTrainCode;
+    }
 
-
-  public long getSeat() {
-    return seat;
-  }
-
-  public void setSeat(long seat) {
-    this.seat = seat;
-  }
+    public void setStationTrainCode(String stationTrainCode) {
+        this.stationTrainCode = stationTrainCode;
+    }
 
 
-  public String getStationTrainCode() {
-    return stationTrainCode;
-  }
+    public String getStartStationTelecode() {
+        return startStationTelecode;
+    }
 
-  public void setStationTrainCode(String stationTrainCode) {
-    this.stationTrainCode = stationTrainCode;
-  }
-
-
-  public String getStartStationTelecode() {
-    return startStationTelecode;
-  }
-
-  public void setStartStationTelecode(String startStationTelecode) {
-    this.startStationTelecode = startStationTelecode;
-  }
+    public void setStartStationTelecode(String startStationTelecode) {
+        this.startStationTelecode = startStationTelecode;
+    }
 
 
-  public String getEndStationTelecode() {
-    return endStationTelecode;
-  }
+    public String getEndStationTelecode() {
+        return endStationTelecode;
+    }
 
-  public void setEndStationTelecode(String endStationTelecode) {
-    this.endStationTelecode = endStationTelecode;
-  }
-
-
-  public java.sql.Timestamp getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(java.sql.Timestamp startTime) {
-    this.startTime = startTime;
-  }
+    public void setEndStationTelecode(String endStationTelecode) {
+        this.endStationTelecode = endStationTelecode;
+    }
 
 
-  public java.sql.Timestamp getEndTime() {
-    return endTime;
-  }
+    public java.sql.Timestamp getStartTime() {
+        return startTime;
+    }
 
-  public void setEndTime(java.sql.Timestamp endTime) {
-    this.endTime = endTime;
-  }
+    public void setStartTime(java.sql.Timestamp startTime) {
+        this.startTime = startTime;
+    }
 
 
-  public double getPrice() {
-    return price;
-  }
+    public java.sql.Timestamp getEndTime() {
+        return endTime;
+    }
 
-  public void setPrice(double price) {
-    this.price = price;
-  }
+    public void setEndTime(java.sql.Timestamp endTime) {
+        this.endTime = endTime;
+    }
 
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Integer getPassengerId() {
+        return passengerId;
+    }
+
+    public void setPassengerId(Integer passengerId) {
+        this.passengerId = passengerId;
+    }
 }

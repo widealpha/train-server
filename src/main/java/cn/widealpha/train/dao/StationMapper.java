@@ -13,10 +13,10 @@ public interface StationMapper {
     @Select("SELECT telecode from station WHERE telecode = #{telecode}")
     String selectStationNameByTelecode(String telecode);
 
-    @Select("SELECT * FROM same_station WHERE origin = #{telecode}")
-    List<Station> selectSameStationTelecode(String telecode);
+    @Select("SELECT same FROM same_station WHERE origin = #{telecode}")
+    List<String> selectSameStationTelecode(String telecode);
 
     @Lang(MybatisExtendedLanguageDriver.class)
-    @Select("SELECT * FROM station WHERE telecode IN #{telecodeList}")
+    @Select("SELECT * FROM station WHERE telecode IN (#{telecodeList})")
     List<Station> selectStationsByTelecode(List<String> telecodeList);
 }

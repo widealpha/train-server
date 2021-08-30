@@ -33,6 +33,10 @@ public class ResultEntity {
         return success("success", data);
     }
 
+    public static ResultEntity data(StatusCode entity){
+        return new ResultEntity(entity.getCode(), entity.getMessage(), entity.getCode() == 0);
+    }
+
     public static ResultEntity data(){
         return success("success");
     }

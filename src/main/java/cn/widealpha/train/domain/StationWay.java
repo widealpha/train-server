@@ -1,13 +1,14 @@
 package cn.widealpha.train.domain;
 
 
+import java.math.BigInteger;
+
 public class StationWay {
 
   private String startStationTelecode;
   private String endStationTelecode;
-  private String stationTrainCode;
-  private long coachId;
-  private long seat;
+  private Integer coachId;
+  private BigInteger seat;
 
 
   public String getStartStationTelecode() {
@@ -27,31 +28,20 @@ public class StationWay {
     this.endStationTelecode = endStationTelecode;
   }
 
-
-  public String getStationTrainCode() {
-    return stationTrainCode;
-  }
-
-  public void setStationTrainCode(String stationTrainCode) {
-    this.stationTrainCode = stationTrainCode;
-  }
-
-
-  public long getCoachId() {
+  public Integer getCoachId() {
     return coachId;
   }
 
-  public void setCoachId(long coachId) {
+  public void setCoachId(Integer coachId) {
     this.coachId = coachId;
   }
 
 
-  public long getSeat() {
+  public BigInteger getSeat() {
     return seat;
   }
 
-  public void setSeat(long seat) {
+  public void setSeat(BigInteger seat) {
     this.seat = seat;
   }
-
 }

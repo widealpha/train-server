@@ -1,6 +1,7 @@
 package cn.widealpha.train.dao;
 
 import cn.widealpha.train.domain.Train;
+import cn.widealpha.train.util.MybatisExtendedLanguageDriver;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -9,6 +10,10 @@ import java.util.List;
 public interface TrainMapper {
     @Select("SELECT * FROM train WHERE station_train_code = #{stationTrainCode}")
     Train selectTrainByStationTrainCode(String stationTrainCode);
+
+    @Lang(MybatisExtendedLanguageDriver.class)
+    @Select("SELECT distinct * FROM train WHERE station_train_code IN (#{stationTrainCodes})")
+    List<Train> selectTrainsByStationTrainCodes(List<String> stationTrainCodes);
 
     @Select("SELECT * FROM train LIMIT #{page}, #{size}")
     List<Train> selectTrains(int page, int size);

@@ -1,28 +1,28 @@
 package cn.widealpha.train.domain;
 
 
-public class System {
+public class SystemSetting {
 
-  private long id;
-  private long start;
+  private Integer id;
+  private Integer start;
   private java.sql.Time updateTime;
-  private long maxTransferCalculate;
+  private Integer maxTransferCalculate;
 
 
-  public long getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 
 
-  public long getStart() {
+  public Integer getStart() {
     return start;
   }
 
-  public void setStart(long start) {
+  public void setStart(Integer start) {
     this.start = start;
   }
 
@@ -36,11 +36,11 @@ public class System {
   }
 
 
-  public long getMaxTransferCalculate() {
+  public Integer getMaxTransferCalculate() {
     return maxTransferCalculate;
   }
 
-  public void setMaxTransferCalculate(long maxTransferCalculate) {
+  public void setMaxTransferCalculate(Integer maxTransferCalculate) {
     this.maxTransferCalculate = maxTransferCalculate;
   }
 

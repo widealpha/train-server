@@ -4,13 +4,13 @@ public class StationTrain {
 
   private String stationTrainCode;
   private String stationTelecode;
-  private long arriveDayDiff;
+  private Integer arriveDayDiff;
   private java.sql.Time arriveTime;
   private java.sql.Time updateArriveTime;
   private java.sql.Time startTime;
   private java.sql.Time updateStartTime;
-  private long startDayDiff;
-  private long stationNo;
+  private Integer startDayDiff;
+  private Integer stationNo;
 
 
   public String getStationTrainCode() {
@@ -31,11 +31,11 @@ public class StationTrain {
   }
 
 
-  public long getArriveDayDiff() {
+  public Integer getArriveDayDiff() {
     return arriveDayDiff;
   }
 
-  public void setArriveDayDiff(long arriveDayDiff) {
+  public void setArriveDayDiff(Integer arriveDayDiff) {
     this.arriveDayDiff = arriveDayDiff;
   }
 
@@ -76,20 +76,20 @@ public class StationTrain {
   }
 
 
-  public long getStartDayDiff() {
+  public Integer getStartDayDiff() {
     return startDayDiff;
   }
 
-  public void setStartDayDiff(long startDayDiff) {
+  public void setStartDayDiff(Integer startDayDiff) {
     this.startDayDiff = startDayDiff;
   }
 
 
-  public long getStationNo() {
+  public Integer getStationNo() {
     return stationNo;
   }
 
-  public void setStationNo(long stationNo) {
+  public void setStationNo(Integer stationNo) {
     this.stationNo = stationNo;
   }
 

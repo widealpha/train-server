@@ -36,7 +36,9 @@ public enum StatusCode {
     NO_PERMISSION(3001, "没有权限"),
     NO_DATA_EXIST(3002, "数据不存在"),
     NO_PERMISSION_OR_EMPTY(3003, "请求数据不存在或无权获取数据"),
-    DATA_ALREADY_EXIST(3004, "数据已存在");
+    DATA_ALREADY_EXIST(3004, "数据已存在"),
+    NO_TICKET(3005,"没有空余车票"),
+    NO_TRAIN(3006, "车次不存在");
 
     private Integer code;
     private String message;

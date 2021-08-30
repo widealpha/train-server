@@ -5,7 +5,7 @@ public class StationPrice {
 
   private String startStationTelecode;
   private String endStationTelecode;
-  private double price;
+  private Double price;
   private String trainClassCode;
   private String seatTypeCode;
 
@@ -28,11 +28,11 @@ public class StationPrice {
   }
 
 
-  public double getPrice() {
+  public Double getPrice() {
     return price;
   }
 
-  public void setPrice(double price) {
+  public void setPrice(Double price) {
     this.price = price;
   }
 

@@ -1,28 +1,30 @@
 package cn.widealpha.train.domain;
 
+import java.math.BigInteger;
+
 public class Coach {
 
-  private long coachId;
-  private long coachNo;
+  private Integer coachId;
+  private Integer coachNo;
   private String stationTrainCode;
   private String seatTypeCode;
-  private  long seat;
+  private BigInteger seat;
 
 
-  public long getCoachId() {
+  public Integer getCoachId() {
     return coachId;
   }
 
-  public void setCoachId(long coachId) {
+  public void setCoachId(Integer coachId) {
     this.coachId = coachId;
   }
 
 
-  public long getCoachNo() {
+  public Integer getCoachNo() {
     return coachNo;
   }
 
-  public void setCoachNo(long coachNo) {
+  public void setCoachNo(Integer coachNo) {
     this.coachNo = coachNo;
   }
 
@@ -44,13 +46,11 @@ public class Coach {
     this.seatTypeCode = seatTypeCode;
   }
 
-
-  public long getSeat() {
+  public BigInteger getSeat() {
     return seat;
   }
 
-  public void setSeat(long seat) {
+  public void setSeat(BigInteger seat) {
     this.seat = seat;
   }
-
 }
