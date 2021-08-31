@@ -14,7 +14,7 @@ public interface UserMapper {
     @Select("SELECT username FROM user WHERE id = #{userId}")
     String selectUsernameById(int userId);
 
-    @Options(useGeneratedKeys = true,keyProperty = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert("INSERT INTO user (username, password) VALUES (#{username}, #{password})")
     boolean insert(User user);
 }

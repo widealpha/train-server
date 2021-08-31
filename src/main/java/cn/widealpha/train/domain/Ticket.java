@@ -1,11 +1,15 @@
 package cn.widealpha.train.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigInteger;
 
 public class Ticket {
 
     private Integer ticketId;
     private Integer coachId;
+
+    @JsonIgnore
     private BigInteger seat;
     private String stationTrainCode;
     private String startStationTelecode;
@@ -14,6 +18,8 @@ public class Ticket {
     private java.sql.Timestamp endTime;
     private Double price;
     private Integer passengerId;
+    private Integer orderId;
+    private Boolean student;
 
     public Integer getTicketId() {
         return ticketId;
@@ -99,5 +105,21 @@ public class Ticket {
 
     public void setPassengerId(Integer passengerId) {
         this.passengerId = passengerId;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public Boolean getStudent() {
+        return student;
+    }
+
+    public void setStudent(Boolean student) {
+        this.student = student;
     }
 }

@@ -2,7 +2,7 @@ package cn.widealpha.train.bean;
 
 public enum StatusCode {
     /* 成功 */
-    SUCCESS(0, "成功"),
+    SUCCESS(0, "success"),
 
     /* 默认失败 */
     COMMON_FAIL(-1, "失败"),
@@ -37,8 +37,11 @@ public enum StatusCode {
     NO_DATA_EXIST(3002, "数据不存在"),
     NO_PERMISSION_OR_EMPTY(3003, "请求数据不存在或无权获取数据"),
     DATA_ALREADY_EXIST(3004, "数据已存在"),
-    NO_TICKET(3005,"没有空余车票"),
-    NO_TRAIN(3006, "车次不存在");
+    NO_FREE_TICKET(3005,"没有空余车票"),
+    NO_TRAIN(3006, "车次不存在"),
+    NO_PASSENGER(3007, "无乘客可用"),
+    NO_REAL_NAME(3008, "未实名不可购买车票"),
+    NO_VERIFY(3009, "身份未验证");
 
     private Integer code;
     private String message;

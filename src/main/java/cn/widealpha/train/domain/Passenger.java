@@ -5,6 +5,8 @@ public class Passenger {
   private Integer passengerId;
   private String idCardNo;
   private Boolean student;
+  private Boolean verified;
+  private Boolean studentVerified;
 
 
   public Integer getPassengerId() {
@@ -30,5 +32,21 @@ public class Passenger {
 
   public void setStudent(Boolean student) {
     this.student = student;
+  }
+
+  public Boolean getVerified() {
+    return verified;
+  }
+
+  public void setVerified(Boolean verified) {
+    this.verified = verified;
+  }
+
+  public Boolean getStudentVerified() {
+    return studentVerified;
+  }
+
+  public void setStudentVerified(Boolean studentVerified) {
+    this.studentVerified = studentVerified;
   }
 }

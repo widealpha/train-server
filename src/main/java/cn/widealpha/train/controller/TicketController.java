@@ -17,7 +17,30 @@ public class TicketController {
     ResultEntity buyTicket(@RequestParam String stationTrainCode,
                            @RequestParam String startStationTelecode,
                            @RequestParam String endStationTelecode,
-                           @RequestParam String seatTypeCode) {
-        return ResultEntity.data(ticketService.buyTicket(startStationTelecode, endStationTelecode, stationTrainCode, seatTypeCode));
+                           @RequestParam String seatTypeCode,
+                           @RequestParam int passengerId,
+                           @RequestParam boolean student,
+                           @RequestParam String date) {
+        return ResultEntity.data(ticketService.buyTicket(startStationTelecode, endStationTelecode, stationTrainCode, seatTypeCode, passengerId, student, date));
+    }
+
+    @RequestMapping("cancelTicket")
+    ResultEntity cancelTicket(@RequestParam int ticketId) {
+        return ResultEntity.data(ticketService.cancelTicket(ticketId));
+    }
+
+    @RequestMapping("changeTicket")
+    ResultEntity changeTicket(@RequestParam int ticketId, @RequestParam String stationTrainCode) {
+        return ResultEntity.data(ticketService.changeTicket(ticketId, stationTrainCode));
+    }
+
+    @RequestMapping("userTickets")
+    ResultEntity userTickets() {
+        return ResultEntity.data(ticketService.userTickets());
+    }
+
+    @RequestMapping("passengerTickets")
+    ResultEntity passengerTickets(int passengerId) {
+        return ResultEntity.data(ticketService.passengerTicket(passengerId));
     }
 }

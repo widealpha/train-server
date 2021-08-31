@@ -7,17 +7,14 @@ import java.util.List;
 
 @Mapper
 public interface TickerMapper {
-    @Options(useGeneratedKeys = true,keyProperty = "tickerId")
+    @Options(useGeneratedKeys = true,keyProperty = "ticketId")
     @Insert("INSERT INTO " +
-            "ticket (coach_id, seat, station_train_code, start_station_telecode, end_station_telecode, start_time, end_time, price, passenger_id) " +
-            "VALUES (#{coachId}, #{seat}, #{stationTrainCode}, #{startStationTelecode}, #{endStationTelecode}, #{startTime}, #{endTime}, #{price}, #{passengerId})")
-    Integer addTicket(Ticket ticket);
+            "ticket (coach_id, seat, station_train_code, start_station_telecode, end_station_telecode, start_time, end_time, price, passenger_id, student, order_id) " +
+            "VALUES (#{coachId}, #{seat}, #{stationTrainCode}, #{startStationTelecode}, #{endStationTelecode}, #{startTime}, #{endTime}, #{price}, #{passengerId}, #{student}, #{orderId})")
+    Integer insertTicket(Ticket ticket);
 
-    @Insert("INSERT INTO order_form (user_id, ticket_id, payed) VALUES (#{userId}, #{ticketId}, false)")
-    Integer addTicketUserLink(int tickerId, int userId);
-
-    @Update("UPDATE order_form SET payed = #{payed} WHERE user_id = #{userId} AND ticket_id = #{ticketId}")
-    Integer updateTicketUserLink(int userId, int ticketId, boolean payed);
+    @Update("UPDATE ticket SET order_id = #{orderId} WHERE ticket_id = #{ticketId}")
+    Integer insertTicketOrderLink(int tickerId, int orderId);
 
     @Delete("DELETE FROM ticket WHERE ticket_id = #{ticketId}")
     Integer deleteTicker(int ticketId);
@@ -28,5 +25,13 @@ public interface TickerMapper {
     @Select("SELECT * FROM ticket WHERE ticket_id IN (SELECT ticket_id FROM order_form WHERE user_id = #{userId})")
     List<Ticket> selectTicketByUserId(int userId);
 
+    @Select("SELECT * FROM ticket WHERE order_id = #{orderId} LIMIT 1")
+    Ticket selectTicketByOrderFormId(int orderId);
+
+    @Select("SELECT * FROM ticket WHERE ticket_id = #{tickedId} AND order_id IN (SELECT order_id FROM order_form WHERE user_id = #{userId})")
+    boolean ticketBelongToUserId(int ticketId, int userId);
+
+    @Select("SELECT * FROM ticket WHERE ticket_id = #{ticketId}")
+    Ticket selectTicketByTicketId(int ticketId);
 
 }

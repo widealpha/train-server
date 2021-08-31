@@ -27,6 +27,10 @@ public class TrainService {
     SeatTypeMapper seatTypeMapper;
     @Autowired
     SystemSettingMapper systemSettingMapper;
+    @Autowired
+    CoachMapper coachMapper;
+    @Autowired
+    StationWayMapper stationWayMapper;
 
     public Pager<Train> getTrains(int page, int size) {
         Pager<Train> pager = new Pager<>();
@@ -161,5 +165,34 @@ public class TrainService {
             lastStationTrain = stationTrain;
         }
         return trainPrices;
+    }
+
+    public boolean addCoach(Coach coach) {
+        if (coachMapper.insertCoaches(Collections.singletonList(coach)) > 0) {
+            List<String> stations = stationTrainMapper.selectTelecodeByStationTrain(coach.getStationTrainCode());
+            String lastStation = null;
+            for (String station : stations) {
+                if (lastStation == null) {
+                    lastStation = station;
+                    continue;
+                }
+                StationWay stationWay = new StationWay();
+                stationWay.setSeat(coach.getSeat());
+                stationWay.setCoachId(coach.getCoachId());
+                stationWay.setStartStationTelecode(lastStation);
+                stationWay.setEndStationTelecode(station);
+                stationWayMapper.insertStationWay(stationWay);
+                lastStation = station;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteCoach(int coachId) {
+        if (coachMapper.deleteCoachByCoachId(coachId)) {
+            return stationWayMapper.deleteStationWayByCoachId(coachId);
+        }
+        return false;
     }
 }

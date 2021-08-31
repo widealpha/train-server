@@ -17,7 +17,7 @@ public interface StationTrainMapper {
             "AND station_train_code = #{stationTrainCode} ORDER BY station_no")
     List<StationTrain> selectStationTrainByStartEndCode(String startStationTelecode, String endStationTelecode, String stationTrainCode);
 
-    @Select("SELECT distinct station_telecode FROM station_train WHERE station_train_code = #{stationTrainCode}")
+    @Select("SELECT distinct station_telecode FROM station_train WHERE station_train_code = #{stationTrainCode} ORDER By station_no")
     List<String> selectTelecodeByStationTrain(String stationTrainCode);
 
     @Select("SELECT station_telecode FROM station_train WHERE station_train_code = #{stationTrainCode} " +

@@ -8,10 +8,13 @@ import java.util.List;
 
 @Mapper
 public interface PassengerMapper {
-    @Select("SELECT * FROM passenger WHERE passenger_id IN (SELECT * FROM user_passenger WHERE user_id = #{userId})")
+    @Select("SELECT * FROM passenger WHERE passenger_id IN (SELECT passenger_id FROM user_passenger WHERE user_id = #{userId})")
     List<Passenger> selectPassengersByUserId(int userId);
 
-    @Options(useGeneratedKeys = true,keyProperty = "passenger_id")
+    @Select("SELECT passenger_id FROM passenger WHERE id_card_no = #{idCardNo}")
+    Integer existPassenger(String idCardNo);
+
+    @Options(useGeneratedKeys = true,keyProperty = "passengerId")
     @Insert("INSERT INTO passenger (id_card_no, student) VALUES (#{idCardNo}, #{student})")
     boolean insertPassenger(Passenger passenger);
 

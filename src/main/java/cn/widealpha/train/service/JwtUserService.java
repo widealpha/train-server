@@ -64,7 +64,7 @@ public class JwtUserService implements UserDetailsService {
         try {
             if (userMapper.insert(user)) {
                 UserInfo userInfo = new UserInfo();
-                userInfo.setRealName(username);
+                userInfo.setNickname(username);
                 //插入数据库中产生的主键id
                 userInfo.setUserId(user.getId());
                 if (userInfoMapper.insertUserInfo(userInfo)) {

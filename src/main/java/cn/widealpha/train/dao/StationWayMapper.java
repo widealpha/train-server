@@ -1,9 +1,7 @@
 package cn.widealpha.train.dao;
 
 import cn.widealpha.train.domain.StationWay;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -25,5 +23,12 @@ public interface StationWayMapper {
             "WHERE start_station_telecode = #{startStationTelecode} " +
             "AND end_station_telecode = #{endStationTelecode} " +
             "AND coach_id = #{coachId}")
-    Integer updateStationWaySeat(StationWay stationWay);
+    boolean updateStationWaySeat(StationWay stationWay);
+
+    @Insert("INSERT INTO station_way (start_station_telecode, end_station_telecode, coach_id, seat) " +
+            "VALUES (#{startStationTelecode}, #{endStationTelecode}, #{coachId}, #{seat})")
+    boolean insertStationWay(StationWay stationWay);
+
+    @Delete("DELETE FROM station_way WHERE coach_id = #{coachId}")
+    boolean deleteStationWayByCoachId(int coachId);
 }

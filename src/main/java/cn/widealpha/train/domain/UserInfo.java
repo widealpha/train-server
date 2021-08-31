@@ -3,7 +3,7 @@ package cn.widealpha.train.domain;
 public class UserInfo {
     private Integer userId;
 
-    private String username;
+    private Integer gender;
 
     private String realName;
 
@@ -11,14 +11,36 @@ public class UserInfo {
 
     private String nickname;
 
-    private Boolean student;
+    private String phone;
 
-    public String getUsername() {
-        return username;
+    private String mail;
+
+    private String address;
+
+    private Integer selfPassengerId;
+
+    public Integer getGender() {
+        return gender;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public Integer getUserId() {
@@ -53,11 +75,19 @@ public class UserInfo {
         this.nickname = nickname;
     }
 
-    public Boolean getStudent() {
-        return student;
+    public Integer getSelfPassengerId() {
+        return selfPassengerId;
     }
 
-    public void setStudent(Boolean student) {
-        this.student = student;
+    public void setSelfPassengerId(Integer selfPassengerId) {
+        this.selfPassengerId = selfPassengerId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

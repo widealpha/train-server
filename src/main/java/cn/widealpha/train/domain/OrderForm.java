@@ -4,8 +4,8 @@ public class OrderForm {
 
   private Integer orderId;
   private Integer userId;
-  private Integer ticketId;
   private Boolean payed;
+  private Double price;
 
 
   public Integer getOrderId() {
@@ -25,20 +25,19 @@ public class OrderForm {
     this.userId = userId;
   }
 
-
-  public Integer getTicketId() {
-    return ticketId;
-  }
-
-  public void setTicketId(Integer ticketId) {
-    this.ticketId = ticketId;
-  }
-
   public Boolean getPayed() {
     return payed;
   }
 
   public void setPayed(Boolean payed) {
     this.payed = payed;
+  }
+
+  public Double getPrice() {
+    return price;
+  }
+
+  public void setPrice(Double price) {
+    this.price = price;
   }
 }

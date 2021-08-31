@@ -12,5 +12,5 @@ public interface SystemSettingMapper {
 
     @Update("UPDATE `system` SET start = #{start} AND update_time = #{updateTime} " +
             "AND max_transfer_calculate = #{maxTransferCalculate} WHERE id = 1")
-    Integer updateSystemSetting(SystemSetting systemSetting);
+    Boolean updateSystemSetting(SystemSetting systemSetting);
 }
