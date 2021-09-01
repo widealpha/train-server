@@ -41,7 +41,12 @@ public enum StatusCode {
     NO_TRAIN(3006, "车次不存在"),
     NO_PASSENGER(3007, "无乘客可用"),
     NO_REAL_NAME(3008, "未实名不可购买车票"),
-    NO_VERIFY(3009, "身份未验证");
+    NO_VERIFY(3009, "身份未验证"),
+    BEEN_PAYED(3010, "订单已支付"),
+    PAY_FAILED(3011, "订单支付失败,请稍后重试"),
+    PAY_CANCELED(3012, "订单已取消"),
+    PAY_NEED(3013, "订单未支付"),
+    TIME_CONFLICT(3013, "时间冲突");
 
     private Integer code;
     private String message;

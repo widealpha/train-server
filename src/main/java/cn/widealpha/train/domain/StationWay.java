@@ -9,6 +9,7 @@ public class StationWay {
   private String endStationTelecode;
   private Integer coachId;
   private BigInteger seat;
+  private String date;
 
 
   public String getStartStationTelecode() {
@@ -43,5 +44,13 @@ public class StationWay {
 
   public void setSeat(BigInteger seat) {
     this.seat = seat;
+  }
+
+  public String getDate() {
+    return date;
+  }
+
+  public void setDate(String date) {
+    this.date = date;
   }
 }

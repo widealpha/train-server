@@ -4,6 +4,7 @@ import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.dao.*;
 import cn.widealpha.train.domain.*;
 import cn.widealpha.train.util.UserUtil;
+import com.alipay.api.AlipayApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,8 +42,10 @@ public class TicketService {
     UserInfoMapper userInfoMapper;
     @Autowired
     TrainService trainService;
+    @Autowired
+    OrderFormService orderFormService;
 
-    public List<TrainTicketRemain> trainTicketRemain(String startTelecode, String endTelecode, String stationTrainCode) {
+    public List<TrainTicketRemain> trainTicketRemain(String startTelecode, String endTelecode, String stationTrainCode, String date) {
         List<TrainTicketRemain> trainTicketRemains = new ArrayList<>();
         Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
         if (train == null) {
@@ -66,7 +69,7 @@ public class TicketService {
             trainTicketRemain.setStartStationTelecode(startTelecode);
             trainTicketRemain.setEndStationTelecode(endTelecode);
             trainTicketRemain.setRemaining(0);
-            trainTicketRemain.setDate(new Date());
+            trainTicketRemain.setDate(date);
             trainTicketRemains.add(trainTicketRemain);
         }
 
@@ -74,7 +77,11 @@ public class TicketService {
         //对两个相邻站台遍历
         for (int i = 1; i < stationTrains.size(); i++) {
             StationTrain stationTrain = stationTrains.get(i);
-            List<StationWay> stationWays = stationWayMapper.selectStationWayByStartEnd(lastStationTrain.getStationTelecode(), stationTrain.getStationTelecode());
+            List<StationWay> stationWays = stationWayMapper.selectStationWayByStartEnd(lastStationTrain.getStationTelecode(), stationTrain.getStationTelecode(), date);
+            //未查询到车之间信息
+            if (stationWays.isEmpty()){
+                return new ArrayList<>();
+            }
             //对经过同一段路的同一辆车的多个车厢遍历
             for (StationWay stationWay : stationWays) {
                 //遍历车厢的详细信息,通过位运算与修改剩余座位
@@ -132,11 +139,21 @@ public class TicketService {
         if (stationTrains.size() <= 1) {
             return StatusCode.NO_TRAIN;
         }
+        //查看是否车票时间冲突
+        List<Ticket> tickets = tickerMapper.selectTicketByPassengerId(passengerId);
+        Timestamp startTime = timeToTimeStamp(date, stationTrains.get(0).getStartTime());
+        Timestamp arriveTime = timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime());
+        for (Ticket ticket: tickets){
+            if (ticket.getStartTime().getTime() >= startTime.getTime()
+                    && ticket.getStartTime().getTime() <= arriveTime.getTime()){
+                return StatusCode.TIME_CONFLICT;
+            }
+        }
         StationTrain lastStationTrain = stationTrains.get(0);
         //对两个相邻站台遍历,计算出中间车厢空余的车票位置,结果储存在coach的seat中
         for (int i = 1; i < stationTrains.size(); i++) {
             StationTrain stationTrain = stationTrains.get(i);
-            List<StationWay> stationWays = stationWayMapper.selectStationWayByStartEnd(lastStationTrain.getStationTelecode(), stationTrain.getStationTelecode());
+            List<StationWay> stationWays = stationWayMapper.selectStationWayByStartEnd(lastStationTrain.getStationTelecode(), stationTrain.getStationTelecode(), date);
             //对经过同一段路的同一辆车的多个车厢遍历
             for (StationWay stationWay : stationWays) {
                 //遍历车厢的详细信息,通过位运算与修改剩余座位,seat中每一位都是可用座位
@@ -149,6 +166,7 @@ public class TicketService {
             }
             lastStationTrain = stationTrain;
         }
+
         for (Coach coach : coachList) {
             //找到第一个有空闲的车厢
             if (coach.getSeat().bitCount() > 0) {
@@ -161,6 +179,7 @@ public class TicketService {
                     stationWay.setStartStationTelecode(lastStationTrain.getStationTelecode());
                     stationWay.setEndStationTelecode(stationTrains.get(i).getStationTelecode());
                     stationWay.setCoachId(coach.getCoachId());
+                    stationWay.setDate(date);
                     stationWay = stationWayMapper.selectStationWaysByKey(stationWay);
                     stationWay.setSeat(stationWay.getSeat().clearBit(bitPlace));
                     stationWayMapper.updateStationWaySeat(stationWay);
@@ -223,13 +242,21 @@ public class TicketService {
                 stationWay.setStartStationTelecode(lastStationTrain.getStationTelecode());
                 stationWay.setEndStationTelecode(stationTrains.get(i).getStationTelecode());
                 stationWay.setCoachId(ticket.getCoachId());
+                stationWay.setDate(ticket.getStartTime().toString().substring(0, 10));
                 stationWay = stationWayMapper.selectStationWaysByKey(stationWay);
                 //位与运算加上售出的票
                 stationWay.setSeat(stationWay.getSeat().or(ticket.getSeat()));
                 if (stationWayMapper.updateStationWaySeat(stationWay)) {
                     tickerMapper.deleteTicker(ticketId);
-                    orderForm.setPrice(-ticket.getPrice());
-                    orderFormMapper.insertOrderForm(orderForm);
+                    try {
+                        if (orderFormService.cancelOrderForm(ticket.getOrderId()) == StatusCode.SUCCESS){
+                            orderForm.setPrice(-ticket.getPrice());
+                            orderFormMapper.insertOrderForm(orderForm);
+                        }
+                    } catch (AlipayApiException e){
+                        System.out.println(ticketId + "退款失败");
+                        return StatusCode.COMMON_FAIL;
+                    }
                 }
                 lastStationTrain = stationTrain;
             }
@@ -266,7 +293,7 @@ public class TicketService {
         }
         for (Passenger passenger : passengerMapper.selectPassengersByUserId(passengerId)) {
             if (passenger.getPassengerId() == passengerId) {
-                tickerMapper.selectTicketByPassengerId(passengerId);
+                return tickerMapper.selectTicketByPassengerId(passengerId);
             }
         }
         return new ArrayList<>();

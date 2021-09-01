@@ -2,42 +2,42 @@ package cn.widealpha.train.domain;
 
 public class OrderForm {
 
-  private Integer orderId;
-  private Integer userId;
-  private Boolean payed;
-  private Double price;
+    private Integer orderId;
+    private Integer userId;
+    private Integer payed;
+    private Double price;
 
 
-  public Integer getOrderId() {
-    return orderId;
-  }
+    public Integer getOrderId() {
+        return orderId;
+    }
 
-  public void setOrderId(Integer orderId) {
-    this.orderId = orderId;
-  }
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
 
 
-  public Integer getUserId() {
-    return userId;
-  }
+    public Integer getUserId() {
+        return userId;
+    }
 
-  public void setUserId(Integer userId) {
-    this.userId = userId;
-  }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
-  public Boolean getPayed() {
-    return payed;
-  }
+    public Integer getPayed() {
+        return payed;
+    }
 
-  public void setPayed(Boolean payed) {
-    this.payed = payed;
-  }
+    public void setPayed(Integer payed) {
+        this.payed = payed;
+    }
 
-  public Double getPrice() {
-    return price;
-  }
+    public Double getPrice() {
+        return price;
+    }
 
-  public void setPrice(Double price) {
-    this.price = price;
-  }
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 }

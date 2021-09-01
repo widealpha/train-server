@@ -1,6 +1,5 @@
 package cn.widealpha.train.domain;
 
-import java.util.Date;
 
 public class TrainTicketRemain {
     private String startStationTelecode;
@@ -11,7 +10,7 @@ public class TrainTicketRemain {
     private String trainClassName;
     private String seatTypeCode;
     private String seatTypeName;
-    private Date date;
+    private String date;
 
     public String getStartStationTelecode() {
         return startStationTelecode;
@@ -77,11 +76,11 @@ public class TrainTicketRemain {
         this.seatTypeName = seatTypeName;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

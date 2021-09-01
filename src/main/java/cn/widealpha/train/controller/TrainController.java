@@ -53,10 +53,10 @@ public class TrainController {
     }
 
     @RequestMapping("trainTicketRemaining")
-    ResultEntity trainTicketRemaining(@RequestParam String stationTrainCode, @RequestParam String startStationTelecode, @RequestParam String endStationTelecode){
-        if (StringUtil.anyEmpty(startStationTelecode, endStationTelecode, stationTrainCode)){
+    ResultEntity trainTicketRemaining(@RequestParam String stationTrainCode, @RequestParam String startStationTelecode, @RequestParam String endStationTelecode, @RequestParam String date){
+        if (StringUtil.anyEmpty(startStationTelecode, endStationTelecode, stationTrainCode, date)){
             return ResultEntity.error(StatusCode.PARAM_NOT_VALID);
         }
-        return ResultEntity.data(ticketService.trainTicketRemain(startStationTelecode, endStationTelecode, stationTrainCode));
+        return ResultEntity.data(ticketService.trainTicketRemain(startStationTelecode, endStationTelecode, stationTrainCode, date));
     }
 }

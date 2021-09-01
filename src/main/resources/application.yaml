@@ -1,9 +1,11 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/train?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: 'root'
-    password: '%Kmh123456'
+    url: jdbc:mysql://42.193.97.243:3306/train?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: 'train'
+    password: 'train'
+    hikari:
+      max-lifetime: 500000
   servlet:
     multipart:
       max-file-size: 40MB

@@ -1,5 +1,8 @@
 package cn.widealpha.train.service;
 
+import cn.widealpha.train.bean.ResultEntity;
+import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.config.AlipayConfig;
 import cn.widealpha.train.dao.OrderFormMapper;
 import cn.widealpha.train.dao.StationMapper;
 import cn.widealpha.train.dao.TickerMapper;
@@ -11,14 +14,20 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 public class OrderFormService {
@@ -36,20 +45,103 @@ public class OrderFormService {
         return orderFormMapper.selectOrderFormByUserId(UserUtil.getCurrentUserId());
     }
 
-    public boolean payOrderForm(int orderId) throws AlipayApiException {
+    public ResultEntity payOrderForm(int orderId) throws AlipayApiException {
         OrderForm orderForm = orderFormMapper.selectOrderFormByOrderId(orderId);
-        Ticket ticket = tickerMapper.selectTicketByOrderFormId(orderId);
-        List<Station> stationNames = stationMapper.selectStationsByTelecode(Arrays.asList(ticket.getStartStationTelecode(), ticket.getEndStationTelecode()));
-        AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipaydev.com/gateway.do", "2016072200101XXXX", "请复制第1步中生成的密钥中的商户应用私钥", "json", "utf-8", "沙箱环境RSA2支付宝公钥", "RSA2");
+        if (orderForm == null) {
+            return ResultEntity.error(StatusCode.NO_DATA_EXIST);
+        }
+        if (orderForm.getPayed() == 1) {
+            return ResultEntity.error(StatusCode.BEEN_PAYED);
+        }
+        if (orderForm.getPayed() == 2) {
+            return ResultEntity.error(StatusCode.PAY_CANCELED);
+        }
+        List<Ticket> tickets = tickerMapper.selectTicketByOrderFormId(orderId);
+        if (tickets.isEmpty()) {
+            return ResultEntity.error(StatusCode.NO_DATA_EXIST);
+        }
+        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.certAlipayRequest());
         AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
         AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
         request.setBizModel(model);
-        model.setOutTradeNo(String.valueOf(System.currentTimeMillis()));
+        request.setNotifyUrl(AlipayConfig.notify_url);
+        model.setOutTradeNo(String.valueOf(orderId));
         model.setTotalAmount(orderForm.getPrice().toString());
-        model.setSubject(ticket.getStationTrainCode() + ":" + stationNames.get(0).getName() + "->" + stationNames.get(1).getName());
-        AlipayTradePrecreateResponse response = alipayClient.execute(request);
-        System.out.print(response.getBody());
-        System.out.print(response.getQrCode());
-        return true;
+        StringBuilder s = new StringBuilder();
+        for (Ticket ticket : tickets) {
+            List<Station> stationNames = stationMapper.selectStationsByTelecode(Arrays.asList(ticket.getStartStationTelecode(), ticket.getEndStationTelecode()));
+            s.append(ticket.getStationTrainCode()).append(":").append(stationNames.get(0).getName()).append("->").append(stationNames.get(1).getName());
+            s.append('\n');
+        }
+        model.setSubject(s.toString());
+        AlipayTradePrecreateResponse response = alipayClient.certificateExecute(request);
+        if (response.isSuccess()) {
+            System.out.println("调用成功");
+            return ResultEntity.data(response.getQrCode());
+        } else {
+            System.out.println("调用失败");
+            return ResultEntity.error(StatusCode.PAY_FAILED);
+        }
+    }
+
+    public StatusCode cancelOrderForm(int orderId) throws AlipayApiException {
+        OrderForm orderForm = orderFormMapper.selectOrderFormByOrderId(orderId);
+        if (orderForm == null) {
+            return StatusCode.NO_DATA_EXIST;
+        }
+        if (orderForm.getPayed() == 0) {
+            return StatusCode.PAY_NEED;
+        }
+        if (orderForm.getPayed() == 2) {
+            return StatusCode.PAY_CANCELED;
+        }
+        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.certAlipayRequest());
+        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+        AlipayTradeRefundModel model = new AlipayTradeRefundModel();
+        request.setBizModel(model);
+        model.setOutTradeNo(orderId + "");
+        model.setRefundAmount(orderForm.getPrice() + "");
+        model.setRefundReason("退票");
+        AlipayTradeRefundResponse response = alipayClient.certificateExecute(request);
+        if (response.isSuccess()) {
+            orderForm.setPayed(2);
+            orderFormMapper.updateOrderForm(orderForm);
+            return StatusCode.SUCCESS;
+        } else {
+            return StatusCode.COMMON_FAIL;
+        }
+    }
+
+    @Transactional
+    public void payNotify(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException {
+        //获取支付宝POST过来反馈信息
+        Map<String, String> params = new HashMap<>();
+        Map<String, String[]> requestParams = request.getParameterMap();
+        for (String s : requestParams.keySet()) {
+            String[] values = requestParams.get(s);
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i]
+                        : valueStr + values[i] + ",";
+            }
+            params.put(s, valueStr);
+        }
+        System.out.println(request.getParameterMap());
+        boolean signVerified = AlipaySignature.rsaCertCheckV1(params, AlipayConfig.alipay_cert_path, AlipayConfig.charset, AlipayConfig.sign_type);
+        System.out.println(signVerified);
+        if (signVerified) {
+            //商户订单号
+            String formId = new String(request.getParameter("out_trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            //用户id
+            String money = new String(request.getParameter("total_amount").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            //交易状态
+            String tradeStatus = new String(request.getParameter("trade_status").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            System.out.println(tradeStatus);
+            if ("TRADE_SUCCESS".equals(tradeStatus)) {
+                OrderForm orderForm = orderFormMapper.selectOrderFormByOrderId(Integer.parseInt(formId));
+                orderForm.setPayed(1);
+                orderFormMapper.updateOrderForm(orderForm);
+            }
+        }
     }
 }
