@@ -5,7 +5,7 @@ spring:
     username: 'train'
     password: 'train'
     hikari:
-      max-lifetime: 500000
+      max-lifetime: 60000
   servlet:
     multipart:
       max-file-size: 40MB

@@ -20,11 +20,11 @@ public class StationService {
         return stationMapper.selectStationNameByTelecode(telecode);
     }
 
-    public Integer addStation(Station station) {
+    public String addStation(Station station) {
         if (stationMapper.insertStation(station)) {
-            return station.getStationId();
+            return station.getTelecode();
         }
-        return 0;
+        return null;
     }
 
 }

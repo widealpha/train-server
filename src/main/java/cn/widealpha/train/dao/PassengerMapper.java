@@ -11,6 +11,12 @@ public interface PassengerMapper {
     @Select("SELECT * FROM passenger WHERE passenger_id IN (SELECT passenger_id FROM user_passenger WHERE user_id = #{userId})")
     List<Passenger> selectPassengersByUserId(int userId);
 
+    @Select("SELECT * FROM passenger WHERE passenger_id = #{passengerId} AND passenger_id IN (SELECT passenger_id FROM user_passenger WHERE user_id = #{userId})")
+    Passenger selectPassengersByPassengerIdAndUserId(int passengerId, int userId);
+
+    @Select("SELECT * FROM passenger WHERE passenger_id = #{passengerId}")
+    Passenger selectPassengersByPassengerId(int passengerId);
+
     @Select("SELECT passenger_id FROM passenger WHERE id_card_no = #{idCardNo}")
     Integer existPassenger(String idCardNo);
 

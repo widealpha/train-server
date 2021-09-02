@@ -21,7 +21,7 @@ public interface StationMapper {
     @Select("SELECT * FROM station WHERE telecode IN (#{telecodeList})")
     List<Station> selectStationsByTelecode(List<String> telecodeList);
 
-    @Options(useGeneratedKeys = true, keyProperty = "stationId")
+    @Options(useGeneratedKeys = true, keyProperty = "telecode")
     @Insert("INSERT INTO station (name, telecode, en, abbr) VALUES (name, telecode, en, abbr)")
     boolean insertStation(Station station);
 }

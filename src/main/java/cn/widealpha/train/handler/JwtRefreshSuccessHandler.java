@@ -28,6 +28,7 @@ public class JwtRefreshSuccessHandler implements AuthenticationSuccessHandler {
             String roles = authentication.getAuthorities().stream()
                     .map(Object::toString).collect(Collectors.joining(","));
             String newToken = JwtUtil.createToken(authentication.getName(), ((TrainUser) authentication.getPrincipal()).getUserId(), roles);
+            response.setHeader("content-type", "application/json");
             response.setHeader("Authorization", newToken);
         }
     }

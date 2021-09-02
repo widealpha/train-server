@@ -17,6 +17,7 @@ public class HttpStatusLoginFailureHandler implements AuthenticationFailureHandl
                                         AuthenticationException exception) {
         try {
             response.setCharacterEncoding("UTF-8");
+            response.setHeader("content-type", "application/json");
             response.getWriter().print(JSON.toJSONString(ResultEntity.error(StatusCode.USER_CREDENTIALS_ERROR)));
         } catch (IOException e) {
             e.printStackTrace();

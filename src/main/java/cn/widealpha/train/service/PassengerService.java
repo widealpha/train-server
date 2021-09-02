@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PassengerService {
@@ -19,7 +21,7 @@ public class PassengerService {
         if (UserUtil.getCurrentUserId() != null) {
             Integer passengerId = passengerMapper.existPassenger(passenger.getIdCardNo());
             if (passengerId == null) {
-                if (passengerMapper.insertPassenger(passenger)){
+                if (passengerMapper.insertPassenger(passenger)) {
                     passengerId = passenger.getPassengerId();
                 } else {
                     return StatusCode.COMMON_FAIL;
@@ -33,13 +35,27 @@ public class PassengerService {
         return StatusCode.USER_NOT_LOGIN;
     }
 
-    public StatusCode removePassenger(int passengerId){
+    public StatusCode removePassenger(int passengerId) {
         if (UserUtil.getCurrentUserId() != null) {
-            if (passengerMapper.deletePassengerUserLink(passengerId, UserUtil.getCurrentUserId())){
+            if (passengerMapper.deletePassengerUserLink(passengerId, UserUtil.getCurrentUserId())) {
                 return StatusCode.SUCCESS;
             }
             return StatusCode.NO_DATA_EXIST;
         }
         return StatusCode.USER_NOT_LOGIN;
+    }
+
+    public List<Passenger> myPassengers() {
+        if (UserUtil.getCurrentUserId() != null) {
+            return passengerMapper.selectPassengersByUserId(UserUtil.getCurrentUserId());
+        }
+        return new ArrayList<>();
+    }
+
+    public Passenger passengerInfo(int passengerId) {
+        if (UserUtil.getCurrentUserId() != null) {
+            return passengerMapper.selectPassengersByPassengerIdAndUserId(passengerId, UserUtil.getCurrentUserId());
+        }
+        return null;
     }
 }

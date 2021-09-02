@@ -1,21 +1,10 @@
 package cn.widealpha.train.domain;
 
 public class Station {
-
-  private Integer stationId;
   private String name;
   private String telecode;
   private String en;
   private String abbr;
-
-
-  public Integer getStationId() {
-    return stationId;
-  }
-
-  public void setStationId(Integer stationId) {
-    this.stationId = stationId;
-  }
 
 
   public String getName() {

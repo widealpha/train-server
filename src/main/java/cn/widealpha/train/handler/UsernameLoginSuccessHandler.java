@@ -26,6 +26,7 @@ public class UsernameLoginSuccessHandler implements AuthenticationSuccessHandler
                 .map(Object::toString).collect(Collectors.joining(","));
         String token = JwtUtil.createToken(authentication.getName(), ((TrainUser) authentication.getPrincipal()).getUserId(), roles);
         response.setHeader("Authorization","Bearer " + token);
+        response.setHeader("content-type", "application/json");
         response.setCharacterEncoding("UTF-8");
         try {
             response.getWriter().print(JSON.toJSONString(ResultEntity.data(token)));
