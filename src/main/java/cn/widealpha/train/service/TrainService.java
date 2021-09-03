@@ -4,12 +4,10 @@ import cn.widealpha.train.bean.Pager;
 import cn.widealpha.train.dao.*;
 import cn.widealpha.train.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class TrainService {
@@ -47,7 +45,7 @@ public class TrainService {
         pager.setTotal(count);
         List<Train> trains = trainMapper.selectTrains(page, size);
         for (Train train : trains) {
-            train.setStationTrains(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
         }
         pager.setRows(trains);
         return pager;
@@ -56,7 +54,7 @@ public class TrainService {
     public Train getTrainByName(String stationTrainCode) {
         Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
         if (train != null){
-            train.setStationTrains(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
         }
         return train;
     }
@@ -64,14 +62,18 @@ public class TrainService {
     public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode) {
         List<Train> trains = new ArrayList<>();
         List<String> startSameStations = stationMapper.selectSameStationTelecode(startStationTelecode);
+        startSameStations.add(0, startStationTelecode);
         List<String> endSameStations = stationMapper.selectSameStationTelecode(endStationTelecode);
+        endSameStations.add(0, endStationTelecode);
         for (String start : startSameStations) {
             for (String end : endSameStations) {
                 List<String> trainCodes = stationTrainMapper.selectStationTrainCodeByStartEnd(start, end);
                 if (!trainCodes.isEmpty()) {
                     List<Train> trainList = trainMapper.selectTrainsByStationTrainCodes(trainCodes);
                     for (Train train : trainList) {
-                        train.setStationTrains(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+                        train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+                        train.setNowStartStationTelecode(start);
+                        train.setNowEndStationTelecode(end);
                     }
                     trains.addAll(trainList);
                 }

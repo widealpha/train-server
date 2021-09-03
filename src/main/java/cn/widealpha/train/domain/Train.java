@@ -15,8 +15,9 @@ public class Train {
   private String seatTypes;
   private java.sql.Date startDate;
   private java.sql.Date stopDate;
-  private List<StationTrain> stationTrains;
-
+  private List<StationTrain> trainStations;
+  private String nowStartStationTelecode;
+  private String nowEndStationTelecode;
 
   public String getTrainNo() {
     return trainNo;
@@ -116,11 +117,27 @@ public class Train {
     this.stopDate = stopDate;
   }
 
-  public List<StationTrain> getStationTrains() {
-    return stationTrains;
+  public List<StationTrain> getTrainStations() {
+    return trainStations;
   }
 
-  public void setStationTrains(List<StationTrain> stationTrains) {
-    this.stationTrains = stationTrains;
+  public void setTrainStations(List<StationTrain> trainStations) {
+    this.trainStations = trainStations;
+  }
+
+  public String getNowStartStationTelecode() {
+    return nowStartStationTelecode;
+  }
+
+  public void setNowStartStationTelecode(String nowStartStationTelecode) {
+    this.nowStartStationTelecode = nowStartStationTelecode;
+  }
+
+  public String getNowEndStationTelecode() {
+    return nowEndStationTelecode;
+  }
+
+  public void setNowEndStationTelecode(String nowEndStationTelecode) {
+    this.nowEndStationTelecode = nowEndStationTelecode;
   }
 }

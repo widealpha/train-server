@@ -29,7 +29,8 @@ public interface StationTrainMapper {
     @Select("SELECT t1.station_train_code FROM station_train t1, station_train t2 " +
             "WHERE t1.station_telecode = #{startStationTelecode} " +
             "AND t2.station_telecode = #{endStationTelecode} " +
-            "AND t1.station_train_code = t2.station_train_code")
+            "AND t1.station_train_code = t2.station_train_code " +
+            "AND t1.station_no < t2.station_no")
     List<String> selectStationTrainCodeByStartEnd(String startStationTelecode, String endStationTelecode);
 
     @Select("SELECT t1.station_train_code, t1.station_telecode, t1.arrive_day_diff, t1.arrive_time, t1.update_arrive_time, t1.start_time, t1.update_start_time, t1.start_day_diff, t1.station_no " +
