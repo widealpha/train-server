@@ -8,8 +8,6 @@ public class Ticket {
 
     private Integer ticketId;
     private Integer coachId;
-
-    @JsonIgnore
     private BigInteger seat;
     private String stationTrainCode;
     private String startStationTelecode;

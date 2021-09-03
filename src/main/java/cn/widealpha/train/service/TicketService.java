@@ -1,5 +1,6 @@
 package cn.widealpha.train.service;
 
+import cn.widealpha.train.bean.ResultEntity;
 import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.dao.*;
 import cn.widealpha.train.domain.*;
@@ -13,7 +14,6 @@ import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -44,6 +44,10 @@ public class TicketService {
     TrainService trainService;
     @Autowired
     OrderFormService orderFormService;
+
+    public Ticket ticketInfo(int ticketId){
+        return tickerMapper.selectTicketByTicketId(ticketId);
+    }
 
     public List<TrainTicketRemain> trainTicketRemain(String startTelecode, String endTelecode, String stationTrainCode, String date) {
         List<TrainTicketRemain> trainTicketRemains = new ArrayList<>();
@@ -79,7 +83,7 @@ public class TicketService {
             StationTrain stationTrain = stationTrains.get(i);
             List<StationWay> stationWays = stationWayMapper.selectStationWayByStartEnd(lastStationTrain.getStationTelecode(), stationTrain.getStationTelecode(), date);
             //未查询到车之间信息
-            if (stationWays.isEmpty()){
+            if (stationWays.isEmpty()) {
                 return new ArrayList<>();
             }
             //对经过同一段路的同一辆车的多个车厢遍历
@@ -106,47 +110,47 @@ public class TicketService {
     }
 
     @Transient
-    public StatusCode buyTicket(String startTelecode, String endTelecode, String stationTrainCode, String seatTypeCode, int passengerId, boolean student, String date) {
+    public ResultEntity buyTicket(String startTelecode, String endTelecode, String stationTrainCode, String seatTypeCode, int passengerId, boolean student, String date) {
         if (UserUtil.getCurrentUserId() == null) {
-            return StatusCode.USER_NOT_LOGIN;
+            return ResultEntity.error(StatusCode.USER_NOT_LOGIN);
         }
         UserInfo userInfo = userInfoMapper.selectByUserId(UserUtil.getCurrentUserId());
         if (userInfo.getSelfPassengerId() == null) {
-            return StatusCode.NO_REAL_NAME;
+            return ResultEntity.error(StatusCode.NO_REAL_NAME);
         }
         List<Passenger> passengers = passengerMapper.selectPassengersByUserId(UserUtil.getCurrentUserId());
         Passenger passenger = null;
         for (Passenger p : passengers) {
             if (p.getPassengerId().equals(passengerId)) {
                 if (!p.getVerified()) {
-                    return StatusCode.NO_VERIFY;
+                    return ResultEntity.error(StatusCode.NO_VERIFY);
                 }
                 if (student && !p.getStudentVerified()) {
-                    return StatusCode.NO_VERIFY;
+                    return ResultEntity.error(StatusCode.NO_VERIFY);
                 }
                 passenger = p;
             }
         }
         if (passenger == null) {
-            return StatusCode.NO_PASSENGER;
+            return ResultEntity.error(StatusCode.NO_PASSENGER);
         }
         Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
         if (train == null) {
-            return StatusCode.NO_TRAIN;
+            return ResultEntity.error(StatusCode.NO_TRAIN);
         }
         List<Coach> coachList = coachMapper.selectCoachByStationTrainCodeAndSeatType(stationTrainCode, seatTypeCode);
         List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStartEndCode(startTelecode, endTelecode, stationTrainCode);
         if (stationTrains.size() <= 1) {
-            return StatusCode.NO_TRAIN;
+            return ResultEntity.error(StatusCode.NO_TRAIN);
         }
         //查看是否车票时间冲突
         List<Ticket> tickets = tickerMapper.selectTicketByPassengerId(passengerId);
         Timestamp startTime = timeToTimeStamp(date, stationTrains.get(0).getStartTime());
         Timestamp arriveTime = timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime());
-        for (Ticket ticket: tickets){
+        for (Ticket ticket : tickets) {
             if (ticket.getStartTime().getTime() >= startTime.getTime()
-                    && ticket.getStartTime().getTime() <= arriveTime.getTime()){
-                return StatusCode.TIME_CONFLICT;
+                    && ticket.getStartTime().getTime() <= arriveTime.getTime()) {
+                return ResultEntity.error(StatusCode.TIME_CONFLICT);
             }
         }
         StationTrain lastStationTrain = stationTrains.get(0);
@@ -216,10 +220,10 @@ public class TicketService {
                 ticket.setPassengerId(passengerId);
                 ticket.setPrice(price);
                 tickerMapper.insertTicket(ticket);
-                return StatusCode.SUCCESS;
+                return ResultEntity.data(ticket.getTicketId());
             }
         }
-        return StatusCode.NO_FREE_TICKET;
+        return ResultEntity.error(StatusCode.NO_FREE_TICKET);
     }
 
     @Transient
@@ -249,11 +253,11 @@ public class TicketService {
                 if (stationWayMapper.updateStationWaySeat(stationWay)) {
                     tickerMapper.deleteTicker(ticketId);
                     try {
-                        if (orderFormService.cancelOrderForm(ticket.getOrderId()) == StatusCode.SUCCESS){
+                        if (orderFormService.cancelOrderForm(ticket.getOrderId()) == StatusCode.SUCCESS) {
                             orderForm.setPrice(-ticket.getPrice());
                             orderFormMapper.insertOrderForm(orderForm);
                         }
-                    } catch (AlipayApiException e){
+                    } catch (AlipayApiException e) {
                         System.out.println(ticketId + "退款失败");
                         return StatusCode.COMMON_FAIL;
                     }
@@ -273,7 +277,7 @@ public class TicketService {
         }
         Ticket ticket = tickerMapper.selectTicketByTicketId(ticketId);
         Coach coach = coachMapper.selectCoachByCoachId(ticket.getCoachId());
-        if (buyTicket(ticket.getStartStationTelecode(), ticket.getEndStationTelecode(), stationTrainCode, coach.getSeatTypeCode(), ticket.getPassengerId(), ticket.getStudent(), ticket.getStartTime().toString().substring(0, 10)) == StatusCode.SUCCESS) {
+        if (buyTicket(ticket.getStartStationTelecode(), ticket.getEndStationTelecode(), stationTrainCode, coach.getSeatTypeCode(), ticket.getPassengerId(), ticket.getStudent(), ticket.getStartTime().toString().substring(0, 10)).getCode() == 0) {
             cancelTicket(ticketId);
             return StatusCode.SUCCESS;
         }

@@ -59,4 +59,9 @@ public class TrainController {
         }
         return ResultEntity.data(ticketService.trainTicketRemain(startStationTelecode, endStationTelecode, stationTrainCode, date));
     }
+
+    @RequestMapping("trainStations")
+    ResultEntity trainStations(@RequestParam String stationTrainCode){
+        return ResultEntity.data(trainService.getTrainStations(stationTrainCode));
+    }
 }

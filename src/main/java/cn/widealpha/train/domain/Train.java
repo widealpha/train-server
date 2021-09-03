@@ -1,5 +1,7 @@
 package cn.widealpha.train.domain;
 
+import java.util.List;
+
 public class Train {
 
   private String trainNo;
@@ -13,6 +15,7 @@ public class Train {
   private String seatTypes;
   private java.sql.Date startDate;
   private java.sql.Date stopDate;
+  private List<StationTrain> stationTrains;
 
 
   public String getTrainNo() {
@@ -113,4 +116,11 @@ public class Train {
     this.stopDate = stopDate;
   }
 
+  public List<StationTrain> getStationTrains() {
+    return stationTrains;
+  }
+
+  public void setStationTrains(List<StationTrain> stationTrains) {
+    this.stationTrains = stationTrains;
+  }
 }

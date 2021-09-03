@@ -13,6 +13,11 @@ public class TicketController {
     @Autowired
     TicketService ticketService;
 
+    @RequestMapping("ticketInfo")
+    ResultEntity ticketInfo(@RequestParam int ticketId) {
+        return ResultEntity.data(ticketService.ticketInfo(ticketId));
+    }
+
     @RequestMapping("buyTicket")
     ResultEntity buyTicket(@RequestParam String stationTrainCode,
                            @RequestParam String startStationTelecode,
@@ -21,7 +26,7 @@ public class TicketController {
                            @RequestParam int passengerId,
                            @RequestParam boolean student,
                            @RequestParam String date) {
-        return ResultEntity.data(ticketService.buyTicket(startStationTelecode, endStationTelecode, stationTrainCode, seatTypeCode, passengerId, student, date));
+        return ticketService.buyTicket(startStationTelecode, endStationTelecode, stationTrainCode, seatTypeCode, passengerId, student, date);
     }
 
     @RequestMapping("cancelTicket")

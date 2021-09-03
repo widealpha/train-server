@@ -30,7 +30,8 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         //授权
         http.authorizeRequests()
-                .antMatchers("/user/login", "/user/admin/login", "/user/register", "/user/logout", "/orderForm/notify")
+                .antMatchers("/user/login", "/user/admin/login", "/user/register", "/user/logout",
+                        "/orderForm/notify", "/station/allStations", "/station/info")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and().csrf().disable()  //CSRF禁用，因为不使用session

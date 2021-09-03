@@ -45,12 +45,20 @@ public class TrainService {
         pager.setSize(size);
         pager.setPage(page);
         pager.setTotal(count);
-        pager.setRows(trainMapper.selectTrains(page, size));
+        List<Train> trains = trainMapper.selectTrains(page, size);
+        for (Train train : trains) {
+            train.setStationTrains(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+        }
+        pager.setRows(trains);
         return pager;
     }
 
     public Train getTrainByName(String stationTrainCode) {
-        return trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        if (train != null){
+            train.setStationTrains(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+        }
+        return train;
     }
 
     public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode) {
@@ -61,11 +69,19 @@ public class TrainService {
             for (String end : endSameStations) {
                 List<String> trainCodes = stationTrainMapper.selectStationTrainCodeByStartEnd(start, end);
                 if (!trainCodes.isEmpty()) {
-                    trains.addAll(trainMapper.selectTrainsByStationTrainCodes(trainCodes));
+                    List<Train> trainList = trainMapper.selectTrainsByStationTrainCodes(trainCodes);
+                    for (Train train : trainList) {
+                        train.setStationTrains(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+                    }
+                    trains.addAll(trainList);
                 }
             }
         }
         return trains;
+    }
+
+    public List<StationTrain> getTrainStations(String stationTrainCode) {
+        return stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
     }
 
     public List<ChangeTrain> getTrainsBetweenWithChange(String startStationTelecode, String endStationTelecode) {
