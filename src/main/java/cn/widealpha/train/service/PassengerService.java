@@ -17,22 +17,22 @@ public class PassengerService {
     PassengerMapper passengerMapper;
 
     @Transient
-    public StatusCode addPassenger(Passenger passenger) {
+    public Passenger addPassenger(Passenger passenger) {
         if (UserUtil.getCurrentUserId() != null) {
             Integer passengerId = passengerMapper.existPassenger(passenger.getIdCardNo());
             if (passengerId == null) {
                 if (passengerMapper.insertPassenger(passenger)) {
                     passengerId = passenger.getPassengerId();
                 } else {
-                    return StatusCode.COMMON_FAIL;
+                    return null;
                 }
             } else {
                 passenger.setPassengerId(passengerId);
             }
-            passengerMapper.insertPassengerUserLink(UserUtil.getCurrentUserId(), passengerId);
-            return StatusCode.SUCCESS;
+            passengerMapper.insertPassengerUserLink(passengerId, UserUtil.getCurrentUserId());
+            return passenger;
         }
-        return StatusCode.USER_NOT_LOGIN;
+        return null;
     }
 
     public StatusCode removePassenger(int passengerId) {

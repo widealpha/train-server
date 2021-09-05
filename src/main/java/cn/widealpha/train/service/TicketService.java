@@ -33,7 +33,7 @@ public class TicketService {
     @Autowired
     CoachMapper coachMapper;
     @Autowired
-    TickerMapper tickerMapper;
+    TicketMapper ticketMapper;
     @Autowired
     OrderFormMapper orderFormMapper;
     @Autowired
@@ -46,7 +46,7 @@ public class TicketService {
     OrderFormService orderFormService;
 
     public Ticket ticketInfo(int ticketId){
-        return tickerMapper.selectTicketByTicketId(ticketId);
+        return ticketMapper.selectTicketByTicketId(ticketId);
     }
 
     public List<TrainTicketRemain> trainTicketRemain(String startTelecode, String endTelecode, String stationTrainCode, String date) {
@@ -110,7 +110,7 @@ public class TicketService {
     }
 
     @Transient
-    public ResultEntity buyTicket(String startTelecode, String endTelecode, String stationTrainCode, String seatTypeCode, int passengerId, boolean student, String date) {
+    public ResultEntity buyTicket(String startTelecode, String endTelecode, String stationTrainCode, String seatTypeCode, int passengerId, boolean student, String date, Character preferSeat) {
         if (UserUtil.getCurrentUserId() == null) {
             return ResultEntity.error(StatusCode.USER_NOT_LOGIN);
         }
@@ -144,7 +144,7 @@ public class TicketService {
             return ResultEntity.error(StatusCode.NO_TRAIN);
         }
         //查看是否车票时间冲突
-        List<Ticket> tickets = tickerMapper.selectTicketByPassengerId(passengerId);
+        List<Ticket> tickets = ticketMapper.selectTicketByPassengerId(passengerId);
         Timestamp startTime = timeToTimeStamp(date, stationTrains.get(0).getStartTime());
         Timestamp arriveTime = timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime());
         for (Ticket ticket : tickets) {
@@ -170,57 +170,106 @@ public class TicketService {
             }
             lastStationTrain = stationTrain;
         }
-
-        for (Coach coach : coachList) {
-            //找到第一个有空闲的车厢
-            if (coach.getSeat().bitCount() > 0) {
-                int bitPlace = coach.getSeat().getLowestSetBit();
-                //遍历所有相邻站台修改座位
-                lastStationTrain = stationTrains.get(0);
-                for (int i = 1; i < stationTrains.size(); i++) {
-                    StationTrain stationTrain = stationTrains.get(i);
-                    StationWay stationWay = new StationWay();
-                    stationWay.setStartStationTelecode(lastStationTrain.getStationTelecode());
-                    stationWay.setEndStationTelecode(stationTrains.get(i).getStationTelecode());
-                    stationWay.setCoachId(coach.getCoachId());
-                    stationWay.setDate(date);
-                    stationWay = stationWayMapper.selectStationWaysByKey(stationWay);
-                    stationWay.setSeat(stationWay.getSeat().clearBit(bitPlace));
-                    stationWayMapper.updateStationWaySeat(stationWay);
-                    lastStationTrain = stationTrain;
-                }
-                double price = 0;
-                //计算车票价格
-                List<TrainPrice> trainPriceList = trainService.trainPrice(
-                        stationTrains.get(0).getStationTelecode(), lastStationTrain.getStationTelecode(), stationTrainCode);
-                for (TrainPrice trainPrice : trainPriceList) {
-                    if (trainPrice.getSeatTypeCode().equals(seatTypeCode)) {
-                        price = trainPrice.getPrice();
+        if (preferSeat != null) {
+            int model = preferSeat - 'A';
+            BigInteger bigInteger = new BigInteger("0");
+            for (int i = model; i < 64; i+=model) {
+                bigInteger = bigInteger.setBit(i);
+            }
+            for (Coach coach : coachList) {
+                //找到第一个有空闲的车厢,并且座位符合要求的
+                if (coach.getSeat().bitCount() > 0 && coach.getSeat().and(bigInteger).bitCount() > 0) {
+                    int bitPlace = coach.getSeat().getLowestSetBit();
+                    //遍历所有相邻站台修改座位
+                    lastStationTrain = stationTrains.get(0);
+                    for (int i = 1; i < stationTrains.size(); i++) {
+                        StationTrain stationTrain = stationTrains.get(i);
+                        StationWay stationWay = new StationWay();
+                        stationWay.setStartStationTelecode(lastStationTrain.getStationTelecode());
+                        stationWay.setEndStationTelecode(stationTrains.get(i).getStationTelecode());
+                        stationWay.setCoachId(coach.getCoachId());
+                        stationWay.setDate(date);
+                        stationWay = stationWayMapper.selectStationWaysByKey(stationWay);
+                        stationWay.setSeat(stationWay.getSeat().clearBit(bitPlace));
+                        stationWayMapper.updateStationWaySeat(stationWay);
+                        lastStationTrain = stationTrain;
                     }
+                    double price = 0;
+                    //计算车票价格
+                    List<TrainPrice> trainPriceList = trainService.trainPrice(
+                            stationTrains.get(0).getStationTelecode(), lastStationTrain.getStationTelecode(), stationTrainCode);
+                    for (TrainPrice trainPrice : trainPriceList) {
+                        if (trainPrice.getSeatTypeCode().equals(seatTypeCode)) {
+                            price = trainPrice.getPrice();
+                        }
+                    }
+                    if (student && (seatTypeCode.equals("A1") || seatTypeCode.equals("WZ"))) {
+                        price = price * 0.5;
+                    } else if (student) {
+                        price = price * 0.75;
+                    }
+                    Ticket ticket = new Ticket();
+                    ticket.setStudent(student);
+                    ticket.setCoachId(coach.getCoachId());
+                    ticket.setStartStationTelecode(stationTrains.get(0).getStationTelecode());
+                    ticket.setEndStationTelecode(lastStationTrain.getStationTelecode());
+                    ticket.setStationTrainCode(stationTrainCode);
+                    ticket.setSeat(BigInteger.ZERO.setBit(bitPlace));
+                    ticket.setStartTime(timeToTimeStamp(date, stationTrains.get(0).getStartTime()));
+                    ticket.setEndTime(timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime()));
+                    ticket.setPassengerId(passengerId);
+                    ticket.setPrice(price);
+                    ticketMapper.insertTicket(ticket);
+                    return ResultEntity.data(ticket.getTicketId());
                 }
-                if (student && (seatTypeCode.equals("A1") || seatTypeCode.equals("WZ"))) {
-                    price = price * 0.5;
-                } else if (student) {
-                    price = price * 0.75;
+            }
+        } else {
+            for (Coach coach : coachList) {
+                //找到第一个有空闲的车厢
+                if (coach.getSeat().bitCount() > 0) {
+                    int bitPlace = coach.getSeat().getLowestSetBit();
+                    //遍历所有相邻站台修改座位
+                    lastStationTrain = stationTrains.get(0);
+                    for (int i = 1; i < stationTrains.size(); i++) {
+                        StationTrain stationTrain = stationTrains.get(i);
+                        StationWay stationWay = new StationWay();
+                        stationWay.setStartStationTelecode(lastStationTrain.getStationTelecode());
+                        stationWay.setEndStationTelecode(stationTrains.get(i).getStationTelecode());
+                        stationWay.setCoachId(coach.getCoachId());
+                        stationWay.setDate(date);
+                        stationWay = stationWayMapper.selectStationWaysByKey(stationWay);
+                        stationWay.setSeat(stationWay.getSeat().clearBit(bitPlace));
+                        stationWayMapper.updateStationWaySeat(stationWay);
+                        lastStationTrain = stationTrain;
+                    }
+                    double price = 0;
+                    //计算车票价格
+                    List<TrainPrice> trainPriceList = trainService.trainPrice(
+                            stationTrains.get(0).getStationTelecode(), lastStationTrain.getStationTelecode(), stationTrainCode);
+                    for (TrainPrice trainPrice : trainPriceList) {
+                        if (trainPrice.getSeatTypeCode().equals(seatTypeCode)) {
+                            price = trainPrice.getPrice();
+                        }
+                    }
+                    if (student && (seatTypeCode.equals("A1") || seatTypeCode.equals("WZ"))) {
+                        price = price * 0.5;
+                    } else if (student) {
+                        price = price * 0.75;
+                    }
+                    Ticket ticket = new Ticket();
+                    ticket.setStudent(student);
+                    ticket.setCoachId(coach.getCoachId());
+                    ticket.setStartStationTelecode(stationTrains.get(0).getStationTelecode());
+                    ticket.setEndStationTelecode(lastStationTrain.getStationTelecode());
+                    ticket.setStationTrainCode(stationTrainCode);
+                    ticket.setSeat(BigInteger.ZERO.setBit(bitPlace));
+                    ticket.setStartTime(timeToTimeStamp(date, stationTrains.get(0).getStartTime()));
+                    ticket.setEndTime(timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime()));
+                    ticket.setPassengerId(passengerId);
+                    ticket.setPrice(price);
+                    ticketMapper.insertTicket(ticket);
+                    return ResultEntity.data(ticket.getTicketId());
                 }
-                OrderForm orderForm = new OrderForm();
-                orderForm.setUserId(UserUtil.getCurrentUserId());
-                orderForm.setPrice(price);
-                orderFormMapper.insertOrderForm(orderForm);
-                Ticket ticket = new Ticket();
-                ticket.setStudent(student);
-                ticket.setOrderId(orderForm.getOrderId());
-                ticket.setCoachId(coach.getCoachId());
-                ticket.setStartStationTelecode(stationTrains.get(0).getStationTelecode());
-                ticket.setEndStationTelecode(lastStationTrain.getStationTelecode());
-                ticket.setStationTrainCode(stationTrainCode);
-                ticket.setSeat(BigInteger.ZERO.setBit(bitPlace));
-                ticket.setStartTime(timeToTimeStamp(date, stationTrains.get(0).getStartTime()));
-                ticket.setEndTime(timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime()));
-                ticket.setPassengerId(passengerId);
-                ticket.setPrice(price);
-                tickerMapper.insertTicket(ticket);
-                return ResultEntity.data(ticket.getTicketId());
             }
         }
         return ResultEntity.error(StatusCode.NO_FREE_TICKET);
@@ -228,7 +277,7 @@ public class TicketService {
 
     @Transient
     public StatusCode cancelTicket(int ticketId) {
-        Ticket ticket = tickerMapper.selectTicketByTicketId(ticketId);
+        Ticket ticket = ticketMapper.selectTicketByTicketId(ticketId);
         if (ticket == null) {
             return StatusCode.NO_DATA_EXIST;
         } else {
@@ -251,7 +300,7 @@ public class TicketService {
                 //位与运算加上售出的票
                 stationWay.setSeat(stationWay.getSeat().or(ticket.getSeat()));
                 if (stationWayMapper.updateStationWaySeat(stationWay)) {
-                    tickerMapper.deleteTicker(ticketId);
+                    ticketMapper.deleteTicker(ticketId);
                     try {
                         if (orderFormService.cancelOrderForm(ticket.getOrderId()) == StatusCode.SUCCESS) {
                             orderForm.setPrice(-ticket.getPrice());
@@ -272,12 +321,12 @@ public class TicketService {
         if (UserUtil.getCurrentUserId() == null) {
             return StatusCode.NO_PERMISSION;
         }
-        if (!tickerMapper.ticketBelongToUserId(ticketId, UserUtil.getCurrentUserId())) {
+        if (!ticketMapper.ticketBelongToUserId(ticketId, UserUtil.getCurrentUserId())) {
             return StatusCode.NO_PERMISSION;
         }
-        Ticket ticket = tickerMapper.selectTicketByTicketId(ticketId);
+        Ticket ticket = ticketMapper.selectTicketByTicketId(ticketId);
         Coach coach = coachMapper.selectCoachByCoachId(ticket.getCoachId());
-        if (buyTicket(ticket.getStartStationTelecode(), ticket.getEndStationTelecode(), stationTrainCode, coach.getSeatTypeCode(), ticket.getPassengerId(), ticket.getStudent(), ticket.getStartTime().toString().substring(0, 10)).getCode() == 0) {
+        if (buyTicket(ticket.getStartStationTelecode(), ticket.getEndStationTelecode(), stationTrainCode, coach.getSeatTypeCode(), ticket.getPassengerId(), ticket.getStudent(), ticket.getStartTime().toString().substring(0, 10), 'D').getCode() == 0) {
             cancelTicket(ticketId);
             return StatusCode.SUCCESS;
         }
@@ -288,7 +337,7 @@ public class TicketService {
         if (UserUtil.getCurrentUserId() == null) {
             return new ArrayList<>();
         }
-        return tickerMapper.selectTicketByUserId(UserUtil.getCurrentUserId());
+        return ticketMapper.selectTicketByUserId(UserUtil.getCurrentUserId());
     }
 
     public List<Ticket> passengerTicket(int passengerId) {
@@ -297,10 +346,14 @@ public class TicketService {
         }
         for (Passenger passenger : passengerMapper.selectPassengersByUserId(passengerId)) {
             if (passenger.getPassengerId() == passengerId) {
-                return tickerMapper.selectTicketByPassengerId(passengerId);
+                return ticketMapper.selectTicketByPassengerId(passengerId);
             }
         }
         return new ArrayList<>();
+    }
+
+    public List<Ticket> ticketInfoByOrder(int orderId){
+        return ticketMapper.selectTicketByOrderFormId(orderId);
     }
 
     private Timestamp timeToTimeStamp(String date, Time time) {

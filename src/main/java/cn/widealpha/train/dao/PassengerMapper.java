@@ -21,7 +21,7 @@ public interface PassengerMapper {
     Integer existPassenger(String idCardNo);
 
     @Options(useGeneratedKeys = true,keyProperty = "passengerId")
-    @Insert("INSERT INTO passenger (id_card_no, student) VALUES (#{idCardNo}, #{student})")
+    @Insert("INSERT INTO passenger (id_card_no, student, name, phone) VALUES (#{idCardNo}, #{student}, #{name}, #{phone})")
     boolean insertPassenger(Passenger passenger);
 
     @Insert("INSERT INTO user_passenger (passenger_id, user_id) VALUES (#{passengerId}, #{userId})")

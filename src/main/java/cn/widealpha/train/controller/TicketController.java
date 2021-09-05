@@ -1,11 +1,15 @@
 package cn.widealpha.train.controller;
 
 import cn.widealpha.train.bean.ResultEntity;
+import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.service.TicketService;
+import cn.widealpha.train.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
 
 @RestController
 @RequestMapping("ticket")
@@ -25,8 +29,9 @@ public class TicketController {
                            @RequestParam String seatTypeCode,
                            @RequestParam int passengerId,
                            @RequestParam boolean student,
-                           @RequestParam String date) {
-        return ticketService.buyTicket(startStationTelecode, endStationTelecode, stationTrainCode, seatTypeCode, passengerId, student, date);
+                           @RequestParam String date,
+                           Character preferSeat) {
+        return ticketService.buyTicket(startStationTelecode, endStationTelecode, stationTrainCode, seatTypeCode, passengerId, student, date, preferSeat);
     }
 
     @RequestMapping("cancelTicket")
@@ -45,7 +50,31 @@ public class TicketController {
     }
 
     @RequestMapping("passengerTickets")
-    ResultEntity passengerTickets(int passengerId) {
+    ResultEntity passengerTickets(@RequestParam int passengerId) {
         return ResultEntity.data(ticketService.passengerTicket(passengerId));
+    }
+
+    @RequestMapping("ticketInfoByOrder")
+    ResultEntity ticketInfoByOrder(@RequestParam int orderId) {
+        return ResultEntity.data(ticketService.ticketInfoByOrder(orderId));
+    }
+
+    @RequestMapping("transferSeatBigInteger")
+    ResultEntity transferSeatBigInteger(String bigInteger, String seatName) {
+        if (StringUtil.allEmpty(bigInteger, seatName)) {
+            return ResultEntity.error(StatusCode.COMMON_FAIL);
+        }
+        if (StringUtil.isEmpty(bigInteger)) {
+            char c = seatName.charAt(seatName.length() - 1);
+            int r = c - 'A';
+            int i = Integer.parseInt(seatName.substring(0, seatName.length() - 1));
+            BigInteger big = new BigInteger("0");
+            big = big.setBit(i * 4 + r);
+            return ResultEntity.data(big.toString());
+        } else {
+            BigInteger big = new BigInteger(bigInteger);
+            int i = big.getLowestSetBit();
+            return ResultEntity.data("" + (i / 4) + (char) (i % 4 + 'A'));
+        }
     }
 }

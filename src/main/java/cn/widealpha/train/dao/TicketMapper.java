@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
-public interface TickerMapper {
+public interface TicketMapper {
     @Options(useGeneratedKeys = true,keyProperty = "ticketId")
     @Insert("INSERT INTO " +
             "ticket (coach_id, seat, station_train_code, start_station_telecode, end_station_telecode, start_time, end_time, price, passenger_id, student, order_id) " +
@@ -14,7 +14,7 @@ public interface TickerMapper {
     Integer insertTicket(Ticket ticket);
 
     @Update("UPDATE ticket SET order_id = #{orderId} WHERE ticket_id = #{ticketId}")
-    Integer insertTicketOrderLink(int tickerId, int orderId);
+    Integer insertTicketOrderLink(int ticketId, int orderId);
 
     @Delete("DELETE FROM ticket WHERE ticket_id = #{ticketId}")
     Integer deleteTicker(int ticketId);

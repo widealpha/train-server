@@ -29,6 +29,8 @@ public class TrainService {
     CoachMapper coachMapper;
     @Autowired
     StationWayMapper stationWayMapper;
+    @Autowired
+    TicketService ticketService;
 
     public Pager<Train> getTrains(int page, int size) {
         Pager<Train> pager = new Pager<>();
@@ -53,13 +55,13 @@ public class TrainService {
 
     public Train getTrainByName(String stationTrainCode) {
         Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
-        if (train != null){
+        if (train != null) {
             train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
         }
         return train;
     }
 
-    public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode) {
+    public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode, String date) {
         List<Train> trains = new ArrayList<>();
         List<String> startSameStations = stationMapper.selectSameStationTelecode(startStationTelecode);
         startSameStations.add(0, startStationTelecode);
@@ -79,6 +81,12 @@ public class TrainService {
                 }
             }
         }
+//        for (Train train : trains) {
+//            train.setTrainPrices(trainPrice(startStationTelecode, endStationTelecode, train.getStationTrainCode()));
+//            if (date != null){
+//                train.setTrainTicketRemains(ticketService.trainTicketRemain(startStationTelecode, endStationTelecode, train.getStationTrainCode(), date));
+//            }
+//        }
         return trains;
     }
 

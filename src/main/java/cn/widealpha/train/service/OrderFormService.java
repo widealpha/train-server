@@ -5,7 +5,7 @@ import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.config.AlipayConfig;
 import cn.widealpha.train.dao.OrderFormMapper;
 import cn.widealpha.train.dao.StationMapper;
-import cn.widealpha.train.dao.TickerMapper;
+import cn.widealpha.train.dao.TicketMapper;
 import cn.widealpha.train.domain.OrderForm;
 import cn.widealpha.train.domain.Station;
 import cn.widealpha.train.domain.Ticket;
@@ -34,9 +34,34 @@ public class OrderFormService {
     @Autowired
     OrderFormMapper orderFormMapper;
     @Autowired
-    TickerMapper tickerMapper;
+    TicketMapper ticketMapper;
     @Autowired
     StationMapper stationMapper;
+
+    public OrderForm addOrderForm(List<Integer> ticketIds){
+        if (UserUtil.getCurrentUserId() != null){
+            List<Ticket> tickets = new ArrayList<>();
+            double price = 0;
+            for (Integer ticketId : ticketIds){
+                Ticket ticket = ticketMapper.selectTicketByTicketId(ticketId);
+                if (ticket == null){
+                    continue;
+                }
+                tickets.add(ticket);
+                price += ticket.getPrice();
+            }
+            OrderForm orderForm = new OrderForm();
+            orderForm.setUserId(UserUtil.getCurrentUserId());
+            orderForm.setPrice(price);
+            orderFormMapper.insertOrderForm(orderForm);
+            orderForm = orderFormMapper.selectOrderFormByOrderId(orderForm.getOrderId());
+            for (Ticket ticket : tickets){
+                ticketMapper.insertTicketOrderLink(ticket.getTicketId(), orderForm.getOrderId());
+            }
+            return orderForm;
+        }
+        return null;
+    }
 
     public List<OrderForm> userOrderForms() {
         if (UserUtil.getCurrentUserId() == null) {
@@ -56,7 +81,7 @@ public class OrderFormService {
         if (orderForm.getPayed() == 2) {
             return ResultEntity.error(StatusCode.PAY_CANCELED);
         }
-        List<Ticket> tickets = tickerMapper.selectTicketByOrderFormId(orderId);
+        List<Ticket> tickets = ticketMapper.selectTicketByOrderFormId(orderId);
         if (tickets.isEmpty()) {
             return ResultEntity.error(StatusCode.NO_DATA_EXIST);
         }
@@ -110,6 +135,14 @@ public class OrderFormService {
         } else {
             return StatusCode.COMMON_FAIL;
         }
+    }
+
+    public ResultEntity orderFormStatus(int orderId){
+        OrderForm orderForm =orderFormMapper.selectOrderFormByOrderId(orderId);
+        if (orderForm.getUserId().equals(UserUtil.getCurrentUserId())){
+            return ResultEntity.data(orderForm.getPayed());
+        }
+        return ResultEntity.error(StatusCode.NO_PERMISSION);
     }
 
     @Transactional

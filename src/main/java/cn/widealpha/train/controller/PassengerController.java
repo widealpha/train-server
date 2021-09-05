@@ -1,8 +1,11 @@
 package cn.widealpha.train.controller;
 
 import cn.widealpha.train.bean.ResultEntity;
+import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.domain.Passenger;
 import cn.widealpha.train.service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,5 +24,19 @@ public class PassengerController {
     @RequestMapping("passengerInfo")
     ResultEntity passengerInfo(@RequestParam int passengerId) {
         return ResultEntity.data(passengerService.passengerInfo(passengerId));
+    }
+
+    @RequestMapping("addPassenger")
+    public ResultEntity addPassenger(@ModelAttribute Passenger passenger){
+        passenger = passengerService.addPassenger(passenger);
+        if (passenger == null){
+            return ResultEntity.error(StatusCode.DATA_ALREADY_EXIST);
+        }
+        return ResultEntity.data(passenger);
+    }
+
+    @RequestMapping("removePassenger")
+    public ResultEntity addPassenger(@RequestParam int passengerId){
+        return ResultEntity.data(passengerService.removePassenger(passengerId));
     }
 }

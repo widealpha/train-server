@@ -1,11 +1,14 @@
 package cn.widealpha.train.domain;
 
+import java.sql.Timestamp;
+
 public class OrderForm {
 
     private Integer orderId;
     private Integer userId;
     private Integer payed;
     private Double price;
+    private Timestamp time;
 
 
     public Integer getOrderId() {
@@ -39,5 +42,13 @@ public class OrderForm {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Timestamp getTime() {
+        return time;
+    }
+
+    public void setTime(Timestamp time) {
+        this.time = time;
     }
 }

@@ -1,6 +1,7 @@
 package cn.widealpha.train.controller;
 
 import cn.widealpha.train.bean.ResultEntity;
+import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.dao.PassengerMapper;
 import cn.widealpha.train.domain.Passenger;
 import cn.widealpha.train.domain.UserInfo;
@@ -35,10 +36,5 @@ public class UserInfoController {
         UserInfo userInfo = userInfoService.getUserInfo();
         userInfo.setSelfPassengerId(passenger.getPassengerId());
         return ResultEntity.data(userInfoService.updateUserInfo(userInfo));
-    }
-
-    @RequestMapping("addPassenger")
-    public ResultEntity addPassenger(@ModelAttribute Passenger passenger){
-        return ResultEntity.data(passengerService.addPassenger(passenger));
     }
 }

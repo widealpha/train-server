@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasRole('ROLE_SYSTEM')")
 @RequestMapping("system")
 public class SystemController {
     @Autowired
@@ -21,6 +20,7 @@ public class SystemController {
         return ResultEntity.data(systemService.getSystemSetting());
     }
 
+    @PreAuthorize("hasRole('ROLE_SYSTEM')")
     @RequestMapping("updateSystemSetting")
     ResultEntity systemSetting(@ModelAttribute SystemSetting systemSetting){
         try {

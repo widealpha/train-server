@@ -18,6 +18,8 @@ public class Train {
   private List<StationTrain> trainStations;
   private String nowStartStationTelecode;
   private String nowEndStationTelecode;
+  private List<TrainPrice> trainPrices;
+  private List<TrainTicketRemain> trainTicketRemains;
 
   public String getTrainNo() {
     return trainNo;
@@ -139,5 +141,21 @@ public class Train {
 
   public void setNowEndStationTelecode(String nowEndStationTelecode) {
     this.nowEndStationTelecode = nowEndStationTelecode;
+  }
+
+  public List<TrainPrice> getTrainPrices() {
+    return trainPrices;
+  }
+
+  public void setTrainPrices(List<TrainPrice> trainPrices) {
+    this.trainPrices = trainPrices;
+  }
+
+  public List<TrainTicketRemain> getTrainTicketRemains() {
+    return trainTicketRemains;
+  }
+
+  public void setTrainTicketRemains(List<TrainTicketRemain> trainTicketRemains) {
+    this.trainTicketRemains = trainTicketRemains;
   }
 }
