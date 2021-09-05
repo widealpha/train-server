@@ -41,12 +41,17 @@ public class TicketController {
 
     @RequestMapping("changeTicket")
     ResultEntity changeTicket(@RequestParam int ticketId, @RequestParam String stationTrainCode) {
-        return ResultEntity.data(ticketService.changeTicket(ticketId, stationTrainCode));
+        return ticketService.changeTicket(ticketId, stationTrainCode);
     }
 
     @RequestMapping("userTickets")
     ResultEntity userTickets() {
         return ResultEntity.data(ticketService.userTickets());
+    }
+
+    @RequestMapping("selfTickets")
+    ResultEntity selfTickets() {
+        return ResultEntity.data(ticketService.selfTickets());
     }
 
     @RequestMapping("passengerTickets")
@@ -67,14 +72,14 @@ public class TicketController {
         if (StringUtil.isEmpty(bigInteger)) {
             char c = seatName.charAt(seatName.length() - 1);
             int r = c - 'A';
-            int i = Integer.parseInt(seatName.substring(0, seatName.length() - 1));
-            BigInteger big = new BigInteger("0");
+            int i = Integer.parseInt(seatName.substring(0, seatName.length() - 1)) - 1;
+            BigInteger big = BigInteger.ZERO;
             big = big.setBit(i * 4 + r);
             return ResultEntity.data(big.toString());
         } else {
             BigInteger big = new BigInteger(bigInteger);
             int i = big.getLowestSetBit();
-            return ResultEntity.data("" + (i / 4) + (char) (i % 4 + 'A'));
+            return ResultEntity.data("" + (i / 4 + 1) + (char) (i % 4 + 'A'));
         }
     }
 }

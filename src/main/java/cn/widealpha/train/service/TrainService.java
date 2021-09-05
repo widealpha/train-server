@@ -190,6 +190,12 @@ public class TrainService {
             }
             lastStationTrain = stationTrain;
         }
+        for (TrainPrice trainPrice : trainPrices) {
+            if (stationTrainCode.startsWith("K")){
+                trainPrice.setPrice(trainPrice.getPrice() * 0.3);
+                trainPrice.setPrice(trainPrice.getPrice() + (100 - trainPrice.getPrice() % 100));
+            }
+        }
         return trainPrices;
     }
 

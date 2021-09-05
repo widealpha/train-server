@@ -28,7 +28,7 @@ public interface TicketMapper {
     @Select("SELECT * FROM ticket WHERE order_id = #{orderId} LIMIT 2")
     List<Ticket> selectTicketByOrderFormId(int orderId);
 
-    @Select("SELECT * FROM ticket WHERE ticket_id = #{tickedId} AND order_id IN (SELECT order_id FROM order_form WHERE user_id = #{userId})")
+    @Select("SELECT * FROM ticket WHERE ticket_id = #{ticketId} AND order_id IN (SELECT order_id FROM order_form WHERE user_id = #{userId})")
     boolean ticketBelongToUserId(int ticketId, int userId);
 
     @Select("SELECT * FROM ticket WHERE ticket_id = #{ticketId}")

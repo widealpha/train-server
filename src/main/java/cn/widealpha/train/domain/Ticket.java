@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigInteger;
 
 public class Ticket {
-
     private Integer ticketId;
     private Integer coachId;
     private BigInteger seat;

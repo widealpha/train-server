@@ -37,6 +37,8 @@ public class OrderFormService {
     TicketMapper ticketMapper;
     @Autowired
     StationMapper stationMapper;
+    @Autowired
+    TicketService ticketService;
 
     public OrderForm addOrderForm(List<Integer> ticketIds){
         if (UserUtil.getCurrentUserId() != null){
@@ -114,27 +116,33 @@ public class OrderFormService {
         if (orderForm == null) {
             return StatusCode.NO_DATA_EXIST;
         }
-        if (orderForm.getPayed() == 0) {
-            return StatusCode.PAY_NEED;
-        }
         if (orderForm.getPayed() == 2) {
             return StatusCode.PAY_CANCELED;
         }
-        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.certAlipayRequest());
-        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
-        AlipayTradeRefundModel model = new AlipayTradeRefundModel();
-        request.setBizModel(model);
-        model.setOutTradeNo(orderId + "");
-        model.setRefundAmount(orderForm.getPrice() + "");
-        model.setRefundReason("退票");
-        AlipayTradeRefundResponse response = alipayClient.certificateExecute(request);
-        if (response.isSuccess()) {
+        List<Ticket> tickets = ticketMapper.selectTicketByOrderFormId(orderId);
+        for (Ticket ticket : tickets) {
+            ticketService.cancelTicket(ticket.getTicketId());
+        }
+        if (orderForm.getPayed() == 1) {
+            AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.certAlipayRequest());
+            AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+            AlipayTradeRefundModel model = new AlipayTradeRefundModel();
+            request.setBizModel(model);
+            model.setOutTradeNo(orderId + "");
+            model.setRefundAmount(orderForm.getPrice() + "");
+            model.setRefundReason("退票");
+            AlipayTradeRefundResponse response = alipayClient.certificateExecute(request);
+            if (response.isSuccess()) {
+                orderForm.setPayed(2);
+                orderFormMapper.updateOrderForm(orderForm);
+                return StatusCode.SUCCESS;
+            }
+        } else {
             orderForm.setPayed(2);
             orderFormMapper.updateOrderForm(orderForm);
             return StatusCode.SUCCESS;
-        } else {
-            return StatusCode.COMMON_FAIL;
         }
+        return StatusCode.BEEN_PAYED;
     }
 
     public ResultEntity orderFormStatus(int orderId){

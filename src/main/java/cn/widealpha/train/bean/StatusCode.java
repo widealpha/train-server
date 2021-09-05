@@ -46,7 +46,7 @@ public enum StatusCode {
     PAY_FAILED(3011, "订单支付失败,请稍后重试"),
     PAY_CANCELED(3012, "订单已取消"),
     PAY_NEED(3013, "订单未支付"),
-    TIME_CONFLICT(3013, "时间冲突");
+    TIME_CONFLICT(3013, "与已购车票时间冲突");
 
     private Integer code;
     private String message;
