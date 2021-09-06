@@ -3,12 +3,16 @@ package cn.widealpha.train.dao;
 import cn.widealpha.train.domain.StationWay;
 import org.apache.ibatis.annotations.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Mapper
 public interface StationWayMapper {
     @Select("SELECT * FROM station_way_base WHERE coach_id IN (SELECT coach_id FROM coach WHERE station_train_code = #{stationTrainCode})")
     List<StationWay> selectStationWaysByStationTrainCode(String stationTrainCode);
+
+    @Update("UPDATE station_way_base SET seat = #{seat} WHERE coach_id = #{coachId}")
+    Integer updateStationWayBaseByCoachId(BigInteger seat, int coachId);
 
     @Select("SELECT * FROM station_way " +
             "WHERE start_station_telecode = #{startStationTelecode} AND end_station_telecode = #{endStationTelecode} AND coach_id = #{coachId} AND date = #{date}")

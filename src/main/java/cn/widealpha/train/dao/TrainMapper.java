@@ -33,7 +33,7 @@ public interface TrainMapper {
             "train_class_code = #{trainClassCode}, seat_types = #{seatTypes}, " +
             "start_date = #{startDate}, stop_date = #{stopDate} " +
             "WHERE station_train_code = #{stationTrainCode}")
-    Train updateTrainByStationTrainCode(Train train);
+    boolean updateTrainByStationTrainCode(Train train);
 
     @Insert("INSERT INTO train " +
             "(train_no, station_train_code, start_station_telecode, start_start_time, " +

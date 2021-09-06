@@ -22,7 +22,7 @@ public class SystemController {
 
     @PreAuthorize("hasRole('ROLE_SYSTEM')")
     @RequestMapping("updateSystemSetting")
-    ResultEntity systemSetting(@ModelAttribute SystemSetting systemSetting){
+    ResultEntity systemSetting(@RequestBody SystemSetting systemSetting){
         try {
             return ResultEntity.data(systemService.updateSystemSetting(systemSetting));
         } catch (Exception e){

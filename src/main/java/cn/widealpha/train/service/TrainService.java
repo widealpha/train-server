@@ -5,7 +5,10 @@ import cn.widealpha.train.dao.*;
 import cn.widealpha.train.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -33,7 +36,7 @@ public class TrainService {
     @Autowired
     TicketService ticketService;
 
-    public List<String> allStationTrainCode(){
+    public List<String> allStationTrainCode() {
         return trainMapper.allStationTrainCode();
     }
 
@@ -113,13 +116,13 @@ public class TrainService {
                         return changeTrains;
                     }
                     //排除始发站情况
-                    if (first.getStationNo() == 1){
+                    if (first.getStationNo() == 1) {
                         continue;
                     }
-                    if (first.getArriveTime() == null){
+                    if (first.getArriveTime() == null) {
                         first.setArriveTime(first.getStartTime());
                     }
-                    if (last.getStartTime() == null){
+                    if (last.getStartTime() == null) {
                         last.setStartTime(last.getArriveTime());
                     }
                     if (last.getStartDayDiff() > first.getArriveDayDiff()
@@ -132,8 +135,8 @@ public class TrainService {
                             continue;
                         }
                         //当天的车辆如果已经发车,不进行添加
-                        if (LocalDate.now().toString().equals(date)){
-                            if (first.getStartTime().toLocalTime().isBefore(LocalTime.now())){
+                        if (LocalDate.now().toString().equals(date)) {
+                            if (first.getStartTime().toLocalTime().isBefore(LocalTime.now())) {
                                 continue;
                             }
                         }
@@ -227,32 +230,35 @@ public class TrainService {
         return trainPrices;
     }
 
-    public boolean addCoach(Coach coach) {
-        if (coachMapper.insertCoaches(Collections.singletonList(coach)) > 0) {
-            List<String> stations = stationTrainMapper.selectTelecodeByStationTrain(coach.getStationTrainCode());
-            String lastStation = null;
-            for (String station : stations) {
-                if (lastStation == null) {
-                    lastStation = station;
-                    continue;
-                }
-                StationWay stationWay = new StationWay();
-                stationWay.setSeat(coach.getSeat());
-                stationWay.setCoachId(coach.getCoachId());
-                stationWay.setStartStationTelecode(lastStation);
-                stationWay.setEndStationTelecode(station);
-                stationWayMapper.insertStationWay(stationWay);
-                lastStation = station;
-            }
-            return true;
-        }
-        return false;
+    public boolean stopTrain(String stationTrainCode) {
+        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        train.setStopDate(Date.valueOf("2000-01-01"));
+        return trainMapper.updateTrainByStationTrainCode(train);
     }
 
-    public boolean deleteCoach(int coachId) {
-        if (coachMapper.deleteCoachByCoachId(coachId)) {
-            return stationWayMapper.deleteStationWayByCoachId(coachId);
+    public boolean startTrain(String stationTrainCode) {
+        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        train.setStopDate(Date.valueOf("2100-01-01"));
+        return trainMapper.updateTrainByStationTrainCode(train);
+    }
+
+    public boolean updateArriveTime(String stationTrainCode, String stationTelecode, int stationNo, String arriveTime) {
+        StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
+        if (arriveTime != null && !arriveTime.isEmpty()) {
+            stationTrain.setUpdateArriveTime(Time.valueOf(arriveTime));
+        } else {
+            stationTrain.setUpdateArriveTime(null);
         }
-        return false;
+        return stationTrainMapper.updateStationTrain(stationTrain);
+    }
+
+    public boolean updateStartTime(String stationTrainCode, String stationTelecode, int stationNo, String startTime) {
+        StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
+        if (startTime != null && !startTime.isEmpty()) {
+            stationTrain.setUpdateArriveTime(Time.valueOf(startTime));
+        } else {
+            stationTrain.setUpdateArriveTime(null);
+        }
+        return stationTrainMapper.updateStationTrain(stationTrain);
     }
 }

@@ -12,7 +12,7 @@ public class ScheduleService {
     @Autowired
     StationWayMapper stationWayMapper;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 6 0 * * ?")
     public void copyStationWayBase() {
         LocalDate date = LocalDate.now();
         for (int i = 0; i < 10; i++) {

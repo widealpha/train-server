@@ -7,6 +7,8 @@ import java.util.List;
 
 @Mapper
 public interface StationTrainMapper {
+    @Select("SELECT * FROM station_train WHERE station_train_code = #{stationTrainCode} AND station_no = #{stationNo} AND station_telecode = #{stationTelecode}")
+    StationTrain selectStationTrainByKey(String stationTrainCode, String stationTelecode, int stationNo);
 
     @Select("SELECT * FROM station_train WHERE station_train_code = #{stationTrainCode} ORDER BY station_no")
     List<StationTrain> selectStationTrainByStationTrainCode(String stationTrainCode);
@@ -17,7 +19,7 @@ public interface StationTrainMapper {
             "AND station_train_code = #{stationTrainCode} ORDER BY station_no")
     List<StationTrain> selectStationTrainByStartEndCode(String startStationTelecode, String endStationTelecode, String stationTrainCode);
 
-    @Select("SELECT distinct station_telecode FROM station_train WHERE station_train_code = #{stationTrainCode} ORDER By station_no")
+    @Select("SELECT t1.station_telecode as station_telecode FROM (SELECT distinct station_telecode, station_no FROM station_train WHERE station_train_code = #{stationTrainCode} ORDER BY station_no) t1")
     List<String> selectTelecodeByStationTrain(String stationTrainCode);
 
     @Select("SELECT station_telecode FROM station_train WHERE station_train_code = #{stationTrainCode} " +
@@ -56,8 +58,8 @@ public interface StationTrainMapper {
     @Update("UPDATE station_train " +
             "SET arrive_day_diff = #{arriveDayDiff}, arrive_time = #{arriveTime}, " +
             "update_arrive_time = #{updateArriveTime}, start_time = #{startTime}, " +
-            "update_start_time = #{updateStartTime}, start_day_diff = #{startDayDiff}, station_no = #{updateStationNo} " +
-            "WHERE station_telecode = #{stationTelecode} AND station_telecode = #{stationTelecode}")
+            "update_start_time = #{updateStartTime}, start_day_diff = #{startDayDiff} " +
+            "WHERE station_telecode = #{stationTelecode} AND station_telecode = #{stationTelecode} AND station_no = #{stationNo}")
     boolean updateStationTrain(StationTrain stationTrain);
 
     @Delete("DELETE FROM station_train WHERE station_train_code = #{stationTrainCode}")

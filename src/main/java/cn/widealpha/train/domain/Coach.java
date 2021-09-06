@@ -9,6 +9,7 @@ public class Coach {
   private String stationTrainCode;
   private String seatTypeCode;
   private BigInteger seat;
+  private Integer seatCount;
 
 
   public Integer getCoachId() {
@@ -52,5 +53,13 @@ public class Coach {
 
   public void setSeat(BigInteger seat) {
     this.seat = seat;
+  }
+
+  public Integer getSeatCount() {
+    return seatCount;
+  }
+
+  public void setSeatCount(Integer seatCount) {
+    this.seatCount = seatCount;
   }
 }
