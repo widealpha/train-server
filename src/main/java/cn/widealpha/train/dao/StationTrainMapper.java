@@ -37,7 +37,8 @@ public interface StationTrainMapper {
             "FROM station_train t1, station_train t2 " +
             "WHERE t1.station_telecode = #{startStationTelecode} " +
             "AND t2.station_telecode = #{endStationTelecode} " +
-            "AND t1.station_train_code = t2.station_train_code")
+            "AND t1.station_train_code = t2.station_train_code " +
+            "AND t1.station_no < t2.station_no")
     List<StationTrain> selectStationTrainByStartEnd(String startStationTelecode, String endStationTelecode);
 
     @Select("SELECT distinct station_train_code FROM station_train WHERE station_telecode = #{stationTelecode}")

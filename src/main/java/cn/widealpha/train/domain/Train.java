@@ -1,6 +1,7 @@
 package cn.widealpha.train.domain;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Train {
 
@@ -157,5 +158,18 @@ public class Train {
 
   public void setTrainTicketRemains(List<TrainTicketRemain> trainTicketRemains) {
     this.trainTicketRemains = trainTicketRemains;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Train train = (Train) o;
+    return Objects.equals(trainNo, train.trainNo) && Objects.equals(stationTrainCode, train.stationTrainCode) && Objects.equals(startStationTelecode, train.startStationTelecode) && Objects.equals(startStartTime, train.startStartTime) && Objects.equals(endStationTelecode, train.endStationTelecode) && Objects.equals(endArriveTime, train.endArriveTime) && Objects.equals(trainTypeCode, train.trainTypeCode) && Objects.equals(trainClassCode, train.trainClassCode) && Objects.equals(seatTypes, train.seatTypes) && Objects.equals(startDate, train.startDate) && Objects.equals(stopDate, train.stopDate) && Objects.equals(trainStations, train.trainStations) && Objects.equals(nowStartStationTelecode, train.nowStartStationTelecode) && Objects.equals(nowEndStationTelecode, train.nowEndStationTelecode) && Objects.equals(trainPrices, train.trainPrices) && Objects.equals(trainTicketRemains, train.trainTicketRemains);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(trainNo, stationTrainCode, startStationTelecode, startStartTime, endStationTelecode, endArriveTime, trainTypeCode, trainClassCode, seatTypes, startDate, stopDate, trainStations, nowStartStationTelecode, nowEndStationTelecode, trainPrices, trainTicketRemains);
   }
 }

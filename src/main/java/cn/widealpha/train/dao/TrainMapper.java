@@ -8,6 +8,9 @@ import java.util.List;
 
 @Mapper
 public interface TrainMapper {
+    @Select("SELECT station_train_code from train")
+    List<String> allStationTrainCode();
+
     @Select("SELECT * FROM train WHERE station_train_code = #{stationTrainCode}")
     Train selectTrainByStationTrainCode(String stationTrainCode);
 

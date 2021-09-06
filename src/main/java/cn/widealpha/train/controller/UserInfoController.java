@@ -29,14 +29,14 @@ public class UserInfoController {
     }
 
     @RequestMapping("updateInfo")
-    public ResultEntity uploadInfo(@ModelAttribute UserInfo userInfo){
+    public ResultEntity uploadInfo(@RequestBody UserInfo userInfo){
         return ResultEntity.data(userInfoService.updateUserInfo(userInfo));
     }
 
 
     @RequestMapping("uploadImage")
-    public ResultEntity uploadHeadImage(@RequestBody MultipartFile multipartFile){
-        return ResultEntity.data(FileUtil.saveImage(multipartFile, "train"));
+    public ResultEntity uploadHeadImage(@RequestParam MultipartFile image){
+        return ResultEntity.data(FileUtil.saveImage(image, "train"));
     }
 
     @RequestMapping("realName")

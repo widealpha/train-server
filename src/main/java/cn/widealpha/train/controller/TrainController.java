@@ -26,6 +26,11 @@ public class TrainController {
         return ResultEntity.data(trainService.getTrains(page, size));
     }
 
+    @RequestMapping("allStationTrainCode")
+    ResultEntity allStationTrainCode() {
+        return ResultEntity.data(trainService.allStationTrainCode());
+    }
+
     @RequestMapping("trainInfo")
     ResultEntity trainInfo(@RequestParam String stationTrainCode) {
         if (stationTrainCode == null) {

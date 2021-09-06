@@ -33,6 +33,10 @@ public class TrainService {
     @Autowired
     TicketService ticketService;
 
+    public List<String> allStationTrainCode(){
+        return trainMapper.allStationTrainCode();
+    }
+
     public Pager<Train> getTrains(int page, int size) {
         Pager<Train> pager = new Pager<>();
         Integer count = trainMapper.count();
@@ -65,9 +69,9 @@ public class TrainService {
     public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode, String date) {
         List<Train> trains = new ArrayList<>();
         List<String> startSameStations = stationMapper.selectSameStationTelecode(startStationTelecode);
-        startSameStations.add(0, startStationTelecode);
+        startSameStations.add(startStationTelecode);
         List<String> endSameStations = stationMapper.selectSameStationTelecode(endStationTelecode);
-        endSameStations.add(0, endStationTelecode);
+        endSameStations.add(endStationTelecode);
         for (String start : startSameStations) {
             for (String end : endSameStations) {
                 List<String> trainCodes = stationTrainMapper.selectStationTrainCodeByStartEnd(start, end);
