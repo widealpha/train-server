@@ -6,6 +6,7 @@ import cn.widealpha.train.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -81,12 +82,6 @@ public class TrainService {
                 }
             }
         }
-//        for (Train train : trains) {
-//            train.setTrainPrices(trainPrice(startStationTelecode, endStationTelecode, train.getStationTrainCode()));
-//            if (date != null){
-//                train.setTrainTicketRemains(ticketService.trainTicketRemain(startStationTelecode, endStationTelecode, train.getStationTrainCode(), date));
-//            }
-//        }
         return trains;
     }
 
@@ -94,7 +89,7 @@ public class TrainService {
         return stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
     }
 
-    public List<ChangeTrain> getTrainsBetweenWithChange(String startStationTelecode, String endStationTelecode) {
+    public List<ChangeTrain> getTrainsBetweenWithChange(String startStationTelecode, String endStationTelecode, String date) {
         //取出数据库设置的最大换乘数量
         SystemSetting systemSetting = systemSettingMapper.selectSystemSetting();
         List<ChangeTrain> changeTrains = new ArrayList<>();
@@ -113,19 +108,48 @@ public class TrainService {
                     if (changeTrains.size() > systemSetting.getMaxTransferCalculate()) {
                         return changeTrains;
                     }
+                    //排除始发站情况
+                    if (first.getStationNo() == 1){
+                        continue;
+                    }
+                    if (first.getArriveTime() == null){
+                        first.setArriveTime(first.getStartTime());
+                    }
+                    if (last.getStartTime() == null){
+                        last.setStartTime(last.getArriveTime());
+                    }
                     if (last.getStartDayDiff() > first.getArriveDayDiff()
                             || (last.getStartTime().after(first.getArriveTime())
                             && last.getStartDayDiff() >= first.getArriveDayDiff())) {
                         LocalTime lastTime = last.getStartTime().toLocalTime();
                         LocalTime firstTime = first.getArriveTime().toLocalTime();
                         //如果后一辆换乘列车需要等待的时间大于1小时,或者换乘时间小于5分钟,不加入此换乘计划
-                        if (lastTime.minusHours(1).isAfter(firstTime) || lastTime.minusMinutes(5).isBefore(firstTime)) {
+                        if (lastTime.minusHours(2).isAfter(firstTime) || lastTime.minusMinutes(5).isBefore(firstTime)) {
                             continue;
+                        }
+                        //当天的车辆如果已经发车,不进行添加
+                        if (LocalDate.now().toString().equals(date)){
+                            if (first.getStartTime().toLocalTime().isBefore(LocalTime.now())){
+                                continue;
+                            }
                         }
                         ChangeTrain changeTrain = new ChangeTrain();
                         changeTrain.setChangeStation(station);
+
                         changeTrain.setFirstStationTrainCode(first.getStationTrainCode());
+                        Train firstTrain = trainMapper.selectTrainByStationTrainCode(first.getStationTrainCode());
+                        firstTrain.setNowStartStationTelecode(startStationTelecode);
+                        firstTrain.setNowEndStationTelecode(station);
+                        firstTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(first.getStationTrainCode()));
+                        changeTrain.setFirstTrain(firstTrain);
+
                         changeTrain.setLastStationTrainCode(last.getStationTrainCode());
+                        Train lastTrain = trainMapper.selectTrainByStationTrainCode(last.getStationTrainCode());
+                        lastTrain.setNowStartStationTelecode(station);
+                        lastTrain.setNowEndStationTelecode(endStationTelecode);
+                        lastTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(last.getStationTrainCode()));
+                        changeTrain.setLastTrain(lastTrain);
+
                         changeTrain.setFirstTrainArriveTime(first.getArriveTime());
                         changeTrain.setLastTrainStartTime(last.getStartTime());
                         if (last.getStartDayDiff() > first.getArriveDayDiff()) {
@@ -191,7 +215,7 @@ public class TrainService {
             lastStationTrain = stationTrain;
         }
         for (TrainPrice trainPrice : trainPrices) {
-            if (stationTrainCode.startsWith("K")){
+            if (stationTrainCode.startsWith("K")) {
                 trainPrice.setPrice(trainPrice.getPrice() * 0.3);
                 trainPrice.setPrice(trainPrice.getPrice() + (100 - trainPrice.getPrice() % 100));
             }

@@ -25,7 +25,7 @@ public interface TicketMapper {
     @Select("SELECT * FROM ticket WHERE ticket_id IN (SELECT ticket_id FROM order_form WHERE user_id = #{userId})")
     List<Ticket> selectTicketByUserId(int userId);
 
-    @Select("SELECT * FROM ticket WHERE order_id = #{orderId} LIMIT 2")
+    @Select("SELECT * FROM ticket WHERE order_id = #{orderId}")
     List<Ticket> selectTicketByOrderFormId(int orderId);
 
     @Select("SELECT * FROM ticket WHERE ticket_id = #{ticketId} AND order_id IN (SELECT order_id FROM order_form WHERE user_id = #{userId})")

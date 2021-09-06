@@ -12,12 +12,12 @@ public class ScheduleService {
     @Autowired
     StationWayMapper stationWayMapper;
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void copyStationWayBase() {
         LocalDate date = LocalDate.now();
         for (int i = 0; i < 10; i++) {
             try {
-                LocalDate d1 = date.plusDays(1);
+                LocalDate d1 = date.plusDays(i);
                 System.out.println("更新" + d1 + "数据成功,共更新" + stationWayMapper.copyStationBase(d1.toString()) + "条数据");
             } catch (Exception e) {
                 e.printStackTrace();

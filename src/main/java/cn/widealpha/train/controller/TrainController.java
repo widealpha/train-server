@@ -40,8 +40,8 @@ public class TrainController {
     }
 
     @RequestMapping("trainsBetweenWithChange")
-    ResultEntity trainsBetweenWithChange(@RequestParam String startStationTelecode, @RequestParam String endStationTelecode) {
-        return ResultEntity.data(trainService.getTrainsBetweenWithChange(startStationTelecode, endStationTelecode));
+    ResultEntity trainsBetweenWithChange(@RequestParam String startStationTelecode, @RequestParam String endStationTelecode, @RequestParam String date) {
+        return ResultEntity.data(trainService.getTrainsBetweenWithChange(startStationTelecode, endStationTelecode, date));
     }
 
     @RequestMapping("trainPrice")

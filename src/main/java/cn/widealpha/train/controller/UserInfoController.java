@@ -7,12 +7,11 @@ import cn.widealpha.train.domain.Passenger;
 import cn.widealpha.train.domain.UserInfo;
 import cn.widealpha.train.service.PassengerService;
 import cn.widealpha.train.service.UserInfoService;
+import cn.widealpha.train.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.beans.Transient;
 
@@ -27,6 +26,17 @@ public class UserInfoController {
     @RequestMapping("myInfo")
     public ResultEntity myUserInfo() {
         return ResultEntity.data(userInfoService.getUserInfo());
+    }
+
+    @RequestMapping("updateInfo")
+    public ResultEntity uploadInfo(@ModelAttribute UserInfo userInfo){
+        return ResultEntity.data(userInfoService.updateUserInfo(userInfo));
+    }
+
+
+    @RequestMapping("uploadImage")
+    public ResultEntity uploadHeadImage(@RequestBody MultipartFile multipartFile){
+        return ResultEntity.data(FileUtil.saveImage(multipartFile, "train"));
     }
 
     @RequestMapping("realName")

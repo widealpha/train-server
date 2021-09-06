@@ -9,6 +9,8 @@ public class ChangeTrain {
     private Time lastTrainStartTime;
     private String changeStation;
     private Integer interval;
+    private Train firstTrain;
+    private Train lastTrain;
 
     public String getFirstStationTrainCode() {
         return firstStationTrainCode;
@@ -56,5 +58,21 @@ public class ChangeTrain {
 
     public void setInterval(Integer interval) {
         this.interval = interval;
+    }
+
+    public Train getFirstTrain() {
+        return firstTrain;
+    }
+
+    public void setFirstTrain(Train firstTrain) {
+        this.firstTrain = firstTrain;
+    }
+
+    public Train getLastTrain() {
+        return lastTrain;
+    }
+
+    public void setLastTrain(Train lastTrain) {
+        this.lastTrain = lastTrain;
     }
 }

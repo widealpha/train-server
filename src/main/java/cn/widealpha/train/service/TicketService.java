@@ -173,7 +173,7 @@ public class TicketService {
         if (preferSeat != null) {
             int model = preferSeat - 'A';
             BigInteger bigInteger = BigInteger.ZERO;
-            for (int i = model; i < 64; i += model) {
+            for (int i = model; i < 64; i += 4) {
                 bigInteger = bigInteger.setBit(i);
             }
             for (Coach coach : coachList) {
