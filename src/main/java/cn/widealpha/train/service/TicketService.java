@@ -359,7 +359,7 @@ public class TicketService {
         if (userInfo.getSelfPassengerId() == null) {
             return new ArrayList<>();
         }
-        return ticketMapper.selectTicketByPassengerId(userInfo.getSelfPassengerId());
+        return ticketMapper.selectTicketByPassengerIdEnsurePayed(userInfo.getSelfPassengerId());
     }
 
     public List<Ticket> passengerTicket(int passengerId) {

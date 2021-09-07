@@ -22,7 +22,10 @@ public interface TicketMapper {
     @Select("SELECT * FROM ticket WHERE passenger_id = #{passengerId}")
     List<Ticket> selectTicketByPassengerId(int passengerId);
 
-    @Select("SELECT * FROM ticket WHERE ticket_id IN (SELECT ticket_id FROM order_form WHERE user_id = #{userId})")
+    @Select("SELECT * FROM ticket WHERE passenger_id = #{passengerId} AND order_id in (SELECT order_id FROM order_form WHERE payed = 1)")
+    List<Ticket> selectTicketByPassengerIdEnsurePayed(int passengerId);
+
+    @Select("SELECT * FROM ticket WHERE order_id IN (SELECT order_form.order_id FROM order_form WHERE user_id = #{userId})")
     List<Ticket> selectTicketByUserId(int userId);
 
     @Select("SELECT * FROM ticket WHERE order_id = #{orderId}")
