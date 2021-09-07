@@ -72,4 +72,7 @@ public interface StationTrainMapper {
 
     @Delete("DELETE FROM station_train WHERE station_train_code = #{stationTrainCode}")
     Integer deleteStationTrainByStationTrainCode(String stationTrainCode);
+
+    @Delete("DELETE FROM station_train WHERE station_train_code = #{stationTrainCode} AND station_telecode = #{stationTelecode}")
+    Integer deleteStationTrainByKey(String stationTrainCode, String stationTelecode);
 }

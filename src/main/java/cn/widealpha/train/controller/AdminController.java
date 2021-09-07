@@ -1,10 +1,9 @@
 package cn.widealpha.train.controller;
 
 import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.service.CoachService;
-import cn.widealpha.train.service.OrderFormService;
-import cn.widealpha.train.service.PriceService;
-import cn.widealpha.train.service.TrainService;
+import cn.widealpha.train.domain.SeatType;
+import cn.widealpha.train.domain.TrainClass;
+import cn.widealpha.train.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,11 +22,15 @@ public class AdminController {
     PriceService priceService;
     @Autowired
     OrderFormService orderFormService;
+    @Autowired
+    SeatTypeService seatTypeService;
+    @Autowired
+    TrainClassService trainClassService;
+    @Autowired
+    PassengerService passengerService;
+    @Autowired
+    UserInfoService userInfoService;
 
-    @RequestMapping("addTrain")
-    ResultEntity addTrain() {
-        return ResultEntity.data();
-    }
 
     @RequestMapping("stopTrain")
     ResultEntity stopTrain(@RequestParam String stationTrainCode) {
@@ -68,8 +71,20 @@ public class AdminController {
 
     @RequestMapping("updateTrainStation")
     ResultEntity updateTrainStation(@RequestParam String stationTrainCode, @RequestParam String stationTelecode,
-                                    @RequestParam int stationNo, @RequestParam String updateStationTelecode) {
-        return ResultEntity.data(trainService.updateTrainStation(stationTrainCode, stationTelecode, stationNo, updateStationTelecode));
+                                    @RequestParam int stationNo, @RequestParam String updateStationTelecode, @RequestParam String arriveTime, @RequestParam String startTime, @RequestParam Integer startDayDiff, @RequestParam Integer arriveDayDiff) {
+        return ResultEntity.data(trainService.updateTrainStation(stationTrainCode, stationTelecode, stationNo, updateStationTelecode, arriveTime, startTime, startDayDiff, arriveDayDiff));
+    }
+
+    @RequestMapping("addTrainStation")
+    ResultEntity addTrainStation(@RequestParam String stationTrainCode, @RequestParam String stationTelecode,
+                                 @RequestParam int stationNo, @RequestParam String arriveTime, @RequestParam String startTime, @RequestParam Integer startDayDiff, @RequestParam Integer arriveDayDiff) {
+        return ResultEntity.data(trainService.addTrainStation(stationTrainCode, stationTelecode, stationNo, arriveTime, startTime, startDayDiff, arriveDayDiff));
+    }
+
+
+    @RequestMapping("deleteTrainStation")
+    ResultEntity deleteTrainStation(@RequestParam String stationTrainCode, @RequestParam String stationTelecode, @RequestParam int stationNo) {
+        return ResultEntity.data(trainService.deleteTrainStation(stationTrainCode, stationTelecode, stationNo));
     }
 
     @RequestMapping("updateTrainClassPriceRatio")
@@ -97,4 +112,45 @@ public class AdminController {
         return ResultEntity.data(orderFormService.getSellByTrainClass());
     }
 
+    @RequestMapping("renameTrainClassName")
+    ResultEntity renameTrainClassName(@RequestParam String trainClassCode, @RequestParam String trainClassName) {
+        TrainClass trainClass = new TrainClass();
+        trainClass.setTrainClassCode(trainClassCode);
+        trainClass.setTrainClassName(trainClassName);
+        return ResultEntity.data(trainClassService.renameTrainClass(trainClass));
+    }
+
+    @RequestMapping("renameSeatTypeName")
+    ResultEntity renameSeatTypeName(@RequestParam String seatTypeCode, @RequestParam String seatTypeName) {
+        SeatType seatType = new SeatType();
+        seatType.setSeatTypeCode(seatTypeCode);
+        seatType.setSeatTypeName(seatTypeName);
+        return ResultEntity.data(seatTypeService.renameSeatType(seatType));
+    }
+
+    @RequestMapping("allPassengers")
+    public ResultEntity allPassengers() {
+        return ResultEntity.data(passengerService.allPassengers());
+    }
+
+    @RequestMapping("addTrain")
+    public ResultEntity addTrain(@RequestParam String stationTrainCode, @RequestParam String startStationTelecode, @RequestParam String endStationTelecode, @RequestParam String startTime, @RequestParam String endTime, @RequestParam int arriveDayDiff) {
+        boolean b = trainService.addTrain(stationTrainCode, startStationTelecode, endStationTelecode, startTime, endTime, arriveDayDiff);
+        return ResultEntity.data(b);
+    }
+
+    @RequestMapping("alterPassenger")
+    public ResultEntity alterPassenger(@RequestParam int passengerId){
+        return ResultEntity.data(passengerService.alterPassenger(passengerId));
+    }
+
+    @RequestMapping("allUserInfo")
+    public ResultEntity allUserInfo(){
+        return ResultEntity.data(userInfoService.allUserInfo());
+    }
+
+    @RequestMapping("deleteUser")
+    public ResultEntity deleteUser(int userId){
+        return ResultEntity.data(userInfoService.deleteUser(userId));
+    }
 }

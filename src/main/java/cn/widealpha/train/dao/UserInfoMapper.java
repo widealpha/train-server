@@ -1,10 +1,9 @@
 package cn.widealpha.train.dao;
 
 import cn.widealpha.train.domain.UserInfo;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 @Mapper
 public interface UserInfoMapper {
@@ -19,4 +18,10 @@ public interface UserInfoMapper {
             "SET real_name = #{realName}, gender = #{gender}, phone = #{phone}, mail = #{mail}, address = #{address}, nickname = #{nickname}, head_image = #{headImage}, self_passenger_id = #{selfPassengerId} " +
             "WHERE user_id = #{userId}")
     boolean updateUserInfo(UserInfo userInfo);
+
+    @Select("SELECT * FROM user_info")
+    List<UserInfo> selectAllUserInfo();
+
+    @Delete("DELETE FROM user_info WHERE user_id = #{userId}")
+    boolean deleteUser(int userId);
 }

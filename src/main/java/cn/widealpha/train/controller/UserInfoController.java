@@ -8,8 +8,10 @@ import cn.widealpha.train.domain.UserInfo;
 import cn.widealpha.train.service.PassengerService;
 import cn.widealpha.train.service.UserInfoService;
 import cn.widealpha.train.util.FileUtil;
+import cn.widealpha.train.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,11 +42,17 @@ public class UserInfoController {
     }
 
     @RequestMapping("realName")
-    @Transient
+    @Transactional
     public ResultEntity realName(@ModelAttribute Passenger passenger){
         passengerService.addPassenger(passenger);
         UserInfo userInfo = userInfoService.getUserInfo();
         userInfo.setSelfPassengerId(passenger.getPassengerId());
         return ResultEntity.data(userInfoService.updateUserInfo(userInfo));
     }
+
+    @RequestMapping("isAdmin")
+    public ResultEntity isAdmin(){
+        return ResultEntity.data(UserUtil.hasRole("ROLE_ADMIN") || UserUtil.hasRole("ROLE_SYSTEM")) ;
+    }
+
 }

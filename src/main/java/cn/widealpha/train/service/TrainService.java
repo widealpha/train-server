@@ -6,6 +6,7 @@ import cn.widealpha.train.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.beans.Transient;
 import java.sql.Date;
@@ -243,6 +244,7 @@ public class TrainService {
         return trainMapper.updateTrainByStationTrainCode(train);
     }
 
+    @Transactional
     public boolean updateArriveTime(String stationTrainCode, String stationTelecode, int stationNo, String arriveTime) {
         StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
         if (arriveTime != null && !arriveTime.isEmpty()) {
@@ -253,6 +255,7 @@ public class TrainService {
         return stationTrainMapper.updateStationTrain(stationTrain);
     }
 
+    @Transactional
     public boolean updateStartTime(String stationTrainCode, String stationTelecode, int stationNo, String startTime) {
         StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
         if (startTime != null && !startTime.isEmpty()) {
@@ -264,7 +267,7 @@ public class TrainService {
     }
 
     @Transactional
-    public boolean updateTrainStation(String stationTrainCode, String stationTelecode, int stationNo, String updateStationTelecode) {
+    public boolean updateTrainStation(String stationTrainCode, String stationTelecode, int stationNo, String updateStationTelecode, String arriveTime, String startTime, Integer startDayDiff, Integer arriveDayDiff) {
         StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
         List<Integer> stationNos = stationTrainMapper.selectStationNos(stationTrainCode);
         if (stationNo == stationNos.get(0)) {
@@ -277,6 +280,112 @@ public class TrainService {
             trainMapper.updateTrainByStationTrainCode(train);
         }
         stationTrainMapper.updateStationTrainTelecode(stationTrain.getStationTrainCode(), stationTrain.getStationTelecode(), stationTrain.getStationNo(), updateStationTelecode);
+        stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, updateStationTelecode, stationNo);
+        stationTrain.setStartTime(Time.valueOf(startTime + ":00"));
+        stationTrain.setArriveTime(Time.valueOf(arriveTime + ":00"));
+        if (startDayDiff != null) {
+            stationTrain.setStartDayDiff(startDayDiff);
+        }
+        if (arriveDayDiff != null) {
+            stationTrain.setArriveDayDiff(arriveDayDiff);
+        }
+        stationTrainMapper.updateStationTrain(stationTrain);
+        return true;
+    }
+
+    @Transactional
+    public boolean deleteTrainStation(String stationTrainCode, String stationTelecode, int stationNo) {
+        List<Integer> stationNos = stationTrainMapper.selectStationNos(stationTrainCode);
+        List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
+        if (stationNos.size() <= 2) {
+            return false;
+        }
+        for (int i = 1; i < stationTrains.size() - 1; i++) {
+            if (stationTrains.get(i).getStationTrainCode().equals(stationTrainCode)) {
+                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTrains.get(i - 1).getStationTrainCode(), stationTelecode, stationTrainCode);
+                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTelecode, stationTrains.get(i + 1).getStationTrainCode(), stationTrainCode);
+                stationTrainMapper.deleteStationTrainByKey(stationTrainCode, stationTelecode);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean addTrainStation(String stationTrainCode, String stationTelecode, int stationNo, String arriveTime, String startTime, Integer startDayDiff, Integer arriveDayDiff) {
+        List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
+        for (int i = 0; i < stationTrains.size() - 1; i++) {
+            if (stationTrains.get(i).getStationNo() < stationNo && stationTrains.get(i + 1).getStationNo() > stationNo) {
+                StationTrain stationTrain = new StationTrain();
+                stationTrain.setStationTrainCode(stationTrainCode);
+                stationTrain.setStationTelecode(stationTelecode);
+                stationTrain.setStartTime(Time.valueOf(startTime + ":00"));
+                stationTrain.setArriveTime(Time.valueOf(arriveTime + ":00"));
+                stationTrain.setStartDayDiff(startDayDiff);
+                stationTrain.setArriveDayDiff(arriveDayDiff);
+                stationTrain.setStationNo(stationNo);
+                stationTrainMapper.insertStationTrain(stationTrain);
+                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTrains.get(i).getStationTrainCode(), stationTrains.get(i + 1).getStationTrainCode(), stationTrainCode);
+                List<Coach> coachList = coachMapper.selectCoachByStationTrainCode(stationTrainCode);
+                for (Coach coach : coachList) {
+                    StationWay stationWay = new StationWay();
+                    stationWay.setCoachId(coach.getCoachId());
+                    stationWay.setSeat(coach.getSeat());
+                    stationWay.setStartStationTelecode(stationTrains.get(i).getStationTrainCode());
+                    stationWay.setEndStationTelecode(stationTelecode);
+                    stationWayMapper.insertStationWay(stationWay);
+                    stationWay.setStartStationTelecode(stationTelecode);
+                    stationWay.setEndStationTelecode(stationTrains.get(i + 1).getStationTrainCode());
+                    stationWayMapper.insertStationWay(stationWay);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean addTrain(String stationTrainCode, String startStationTelecode, String endStationTelecode, String startTime, String endTime, int arriveDayDiff) {
+        Train train = new Train();
+        train.setTrainNo("0000000" + stationTrainCode);
+        train.setStationTrainCode(stationTrainCode);
+        train.setStartStationTelecode(startStationTelecode);
+        train.setEndStationTelecode(endStationTelecode);
+        train.setStartStartTime(Time.valueOf(startTime + ":00"));
+        train.setEndArriveTime(Time.valueOf(endTime + ":00"));
+        train.setSeatTypes("29360128");
+        train.setStartDate(Date.valueOf("2000-01-01"));
+        train.setStopDate(Date.valueOf("2100-01-01"));
+        if (stationTrainCode.startsWith("K")) {
+            train.setTrainClassCode("0");
+        } else if (stationTrainCode.startsWith("G")) {
+            train.setTrainClassCode("8");
+        }
+        trainMapper.insertTrain(train);
+        StationTrain stationTrain = new StationTrain();
+        stationTrain.setStationTrainCode(stationTrainCode);
+        stationTrain.setStationTelecode(startStationTelecode);
+        stationTrain.setStartTime(Time.valueOf(startTime + ":00"));
+        stationTrain.setArriveTime(Time.valueOf(startTime + ":00"));
+        stationTrain.setStartDayDiff(0);
+        stationTrain.setArriveDayDiff(0);
+        stationTrain.setStationNo(100);
+        stationTrainMapper.insertStationTrain(stationTrain);
+
+        stationTrain.setStationTelecode(endStationTelecode);
+        stationTrain.setStartTime(Time.valueOf(endTime + ":00"));
+        stationTrain.setArriveTime(Time.valueOf(endTime + ":00"));
+        stationTrain.setStartDayDiff(arriveDayDiff);
+        stationTrain.setArriveDayDiff(arriveDayDiff);
+        stationTrain.setStationNo(2);
+        stationTrainMapper.insertStationTrain(stationTrain);
+
+        StationWay stationWay = new StationWay();
+        stationWay.setCoachId(1);
+        stationWay.setStartStationTelecode(startStationTelecode);
+        stationWay.setEndStationTelecode(endStationTelecode);
+        stationWayMapper.insertStationWay(stationWay);
+
         return true;
     }
 }

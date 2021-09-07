@@ -11,6 +11,9 @@ public interface PassengerMapper {
     @Select("SELECT * FROM passenger WHERE passenger_id IN (SELECT passenger_id FROM user_passenger WHERE user_id = #{userId})")
     List<Passenger> selectPassengersByUserId(int userId);
 
+    @Select("SELECT * FROM passenger")
+    List<Passenger> selectAllPassengers();
+
     @Select("SELECT * FROM passenger WHERE passenger_id = #{passengerId} AND passenger_id IN (SELECT passenger_id FROM user_passenger WHERE user_id = #{userId})")
     Passenger selectPassengersByPassengerIdAndUserId(int passengerId, int userId);
 
@@ -29,4 +32,10 @@ public interface PassengerMapper {
 
     @Delete("DELETE FROM user_passenger WHERE user_id = #{userId} AND passenger_id = #{passengerId}")
     boolean deletePassengerUserLink(int passengerId, int userId);
+
+    @Delete("DELETE FROM user_passenger WHERE passenger_id = #{passengerId}")
+    boolean deletePassengerLink(int passengerId);
+
+    @Update("UPDATE passenger SET student = #{student}, verified = #{verified}, phone = #{phone} WHERE passenger_id = #{passengerId}")
+    boolean updatePassenger(Passenger passenger);
 }

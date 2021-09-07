@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface TrainMapper {
-    @Select("SELECT station_train_code from train")
+    @Select("SELECT distinct station_train_code from train.train")
     List<String> allStationTrainCode();
 
     @Select("SELECT * FROM train WHERE station_train_code = #{stationTrainCode}")
@@ -39,9 +39,9 @@ public interface TrainMapper {
             "(train_no, station_train_code, start_station_telecode, start_start_time, " +
             "end_station_telecode, end_arrive_time, train_type_code, train_class_code, seat_types, start_date, stop_date) " +
             "VALUES (#{trainNo}, #{stationTrainCode}, #{startStationTelecode}, #{startStartTime}, " +
-            "#{endStationTelecode}, #{endArriveTime}, #{trainTypeCode}, #{trainClassCode}, #{seat_types}, #{start_date}, #{stop_date})")
-    Train insertTrain(Train train);
+            "#{endStationTelecode}, #{endArriveTime}, #{trainTypeCode}, #{trainClassCode}, #{seatTypes}, #{startDate}, #{stopDate})")
+    boolean insertTrain(Train train);
 
     @Delete("DELETE FROM train WHERE station_train_code = #{stationTrainCode}")
-    Train deleteTrainByStationTrainCode(String stationTrainCode);
+    boolean deleteTrainByStationTrainCode(String stationTrainCode);
 }

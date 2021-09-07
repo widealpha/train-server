@@ -28,7 +28,11 @@ public class PassengerService {
                     return null;
                 }
             } else {
+                Passenger p = passengerMapper.selectPassengersByPassengerId(passengerId);
                 passenger.setPassengerId(passengerId);
+                if (!p.getVerified()){
+                    return null;
+                }
             }
             passengerMapper.insertPassengerUserLink(passengerId, UserUtil.getCurrentUserId());
             return passenger;
@@ -58,5 +62,17 @@ public class PassengerService {
             return passengerMapper.selectPassengersByPassengerIdAndUserId(passengerId, UserUtil.getCurrentUserId());
         }
         return null;
+    }
+
+    public List<Passenger> allPassengers(){
+        return passengerMapper.selectAllPassengers();
+    }
+
+    @Transactional
+    public boolean alterPassenger(int passengerId){
+        Passenger passenger= passengerMapper.selectPassengersByPassengerId(passengerId);
+        passenger.setVerified(!passenger.getVerified());
+        passengerMapper.updatePassenger(passenger);
+        return passengerMapper.deletePassengerLink(passengerId);
     }
 }

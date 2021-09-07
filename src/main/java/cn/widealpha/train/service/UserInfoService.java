@@ -7,6 +7,8 @@ import cn.widealpha.train.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserInfoService {
     @Autowired
@@ -26,5 +28,13 @@ public class UserInfoService {
             return userInfoMapper.updateUserInfo(info);
         }
         return false;
+    }
+
+    public List<UserInfo> allUserInfo(){
+        return userInfoMapper.selectAllUserInfo();
+    }
+
+    public boolean deleteUser(int userId){
+        return userInfoMapper.deleteUser(userId);
     }
 }

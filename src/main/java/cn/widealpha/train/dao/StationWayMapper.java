@@ -38,5 +38,6 @@ public interface StationWayMapper {
     @Delete("DELETE FROM station_way_base WHERE coach_id = #{coachId}")
     boolean deleteStationWayByCoachId(int coachId);
 
-
+    @Delete("DELETE FROM station_way_base WHERE start_station_telecode = #{startStationTelecode} AND end_station_telecode = #{endStationTelecode} AND coach_id IN (SELECT coach_id FROM coach WHERE station_train_code = #{stationTrainCode})")
+    boolean deleteStationWayByKeyAndStationTrainCode(String startStationTelecode, String endStationTelecode, String stationTrainCode);
 }
