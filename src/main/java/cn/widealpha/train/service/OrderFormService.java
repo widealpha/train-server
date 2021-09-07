@@ -6,9 +6,11 @@ import cn.widealpha.train.config.AlipayConfig;
 import cn.widealpha.train.dao.OrderFormMapper;
 import cn.widealpha.train.dao.StationMapper;
 import cn.widealpha.train.dao.TicketMapper;
+import cn.widealpha.train.dao.TrainMapper;
 import cn.widealpha.train.domain.OrderForm;
 import cn.widealpha.train.domain.Station;
 import cn.widealpha.train.domain.Ticket;
+import cn.widealpha.train.domain.Train;
 import cn.widealpha.train.util.UserUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -27,7 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
+
+import static com.sun.deploy.uitoolkit.impl.awt.AWTClientPrintHelper.print;
 
 @Service
 public class OrderFormService {
@@ -39,14 +44,16 @@ public class OrderFormService {
     StationMapper stationMapper;
     @Autowired
     TicketService ticketService;
+    @Autowired
+    TrainMapper trainMapper;
 
-    public OrderForm addOrderForm(List<Integer> ticketIds){
-        if (UserUtil.getCurrentUserId() != null){
+    public OrderForm addOrderForm(List<Integer> ticketIds) {
+        if (UserUtil.getCurrentUserId() != null) {
             List<Ticket> tickets = new ArrayList<>();
             double price = 0;
-            for (Integer ticketId : ticketIds){
+            for (Integer ticketId : ticketIds) {
                 Ticket ticket = ticketMapper.selectTicketByTicketId(ticketId);
-                if (ticket == null){
+                if (ticket == null) {
                     continue;
                 }
                 tickets.add(ticket);
@@ -57,7 +64,7 @@ public class OrderFormService {
             orderForm.setPrice(price);
             orderFormMapper.insertOrderForm(orderForm);
             orderForm = orderFormMapper.selectOrderFormByOrderId(orderForm.getOrderId());
-            for (Ticket ticket : tickets){
+            for (Ticket ticket : tickets) {
                 ticketMapper.insertTicketOrderLink(ticket.getTicketId(), orderForm.getOrderId());
             }
             return orderForm;
@@ -72,6 +79,7 @@ public class OrderFormService {
         return orderFormMapper.selectOrderFormByUserId(UserUtil.getCurrentUserId());
     }
 
+    @Transactional
     public ResultEntity payOrderForm(int orderId) throws AlipayApiException {
         OrderForm orderForm = orderFormMapper.selectOrderFormByOrderId(orderId);
         if (orderForm == null) {
@@ -111,6 +119,7 @@ public class OrderFormService {
         }
     }
 
+    @Transactional
     public StatusCode cancelOrderForm(int orderId) throws AlipayApiException {
         OrderForm orderForm = orderFormMapper.selectOrderFormByOrderId(orderId);
         if (orderForm == null) {
@@ -145,9 +154,9 @@ public class OrderFormService {
         return StatusCode.BEEN_PAYED;
     }
 
-    public ResultEntity orderFormStatus(int orderId){
-        OrderForm orderForm =orderFormMapper.selectOrderFormByOrderId(orderId);
-        if (orderForm.getUserId().equals(UserUtil.getCurrentUserId())){
+    public ResultEntity orderFormStatus(int orderId) {
+        OrderForm orderForm = orderFormMapper.selectOrderFormByOrderId(orderId);
+        if (orderForm.getUserId().equals(UserUtil.getCurrentUserId())) {
             return ResultEntity.data(orderForm.getPayed());
         }
         return ResultEntity.error(StatusCode.NO_PERMISSION);
@@ -184,5 +193,36 @@ public class OrderFormService {
                 orderFormMapper.updateOrderForm(orderForm);
             }
         }
+    }
+
+    public Map<String, Double> getSellByTime() {
+        Map<String, Double> sealMap = new HashMap<>();
+        List<OrderForm> orderForms = orderFormMapper.selectAllPayedOrderForm();
+        for (OrderForm orderForm : orderForms) {
+            LocalDate date = orderForm.getTime().toLocalDateTime().toLocalDate();
+            if (sealMap.containsKey(date.toString())) {
+                sealMap.put(date.toString(), sealMap.get(date.toString()) + orderForm.getPrice());
+            } else {
+                sealMap.put(date.toString(), orderForm.getPrice());
+            }
+        }
+        return sealMap;
+    }
+
+    public Map<String, Integer> getSellByTrainClass() {
+        Map<String, Integer> sealMap = new HashMap<>();
+        List<OrderForm> orderForms = orderFormMapper.selectAllPayedOrderForm();
+        for (OrderForm orderForm : orderForms) {
+            List<Ticket> tickets = ticketMapper.selectTicketByOrderFormId(orderForm.getOrderId());
+            for (Ticket ticket : tickets) {
+                Train train = trainMapper.selectTrainByStationTrainCode(ticket.getStationTrainCode());
+                if (sealMap.containsKey(train.getTrainClassCode())){
+                    sealMap.put(train.getTrainClassCode(), sealMap.get(train.getTrainClassCode()) + 1);
+                } else {
+                    sealMap.put(train.getTrainClassCode(), 1);
+                }
+            }
+        }
+        return sealMap;
     }
 }

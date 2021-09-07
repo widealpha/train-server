@@ -10,6 +10,9 @@ public interface OrderFormMapper {
     @Select("SELECT * FROM order_form WHERE user_id = #{userId}")
     List<OrderForm> selectOrderFormByUserId(int userId);
 
+    @Select("SELECT * FROM order_form WHERE payed != 0")
+    List<OrderForm> selectAllPayedOrderForm();
+
     @Select("SELECT * FROM order_form WHERE order_id = #{orderId}")
     OrderForm selectOrderFormByOrderId(int orderId);
 
@@ -22,4 +25,6 @@ public interface OrderFormMapper {
 
     @Delete("DELETE FROM order_form WHERE order_id = #{orderId}")
     Boolean deleteOrderForm(int order_id);
+
+
 }

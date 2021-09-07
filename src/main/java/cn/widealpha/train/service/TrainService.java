@@ -5,8 +5,9 @@ import cn.widealpha.train.dao.*;
 import cn.widealpha.train.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -260,5 +261,22 @@ public class TrainService {
             stationTrain.setUpdateArriveTime(null);
         }
         return stationTrainMapper.updateStationTrain(stationTrain);
+    }
+
+    @Transactional
+    public boolean updateTrainStation(String stationTrainCode, String stationTelecode, int stationNo, String updateStationTelecode) {
+        StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
+        List<Integer> stationNos = stationTrainMapper.selectStationNos(stationTrainCode);
+        if (stationNo == stationNos.get(0)) {
+            Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+            train.setStartStationTelecode(updateStationTelecode);
+            trainMapper.updateTrainByStationTrainCode(train);
+        } else if (stationNo == stationNos.get(stationNos.size() - 1)) {
+            Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+            train.setEndStationTelecode(updateStationTelecode);
+            trainMapper.updateTrainByStationTrainCode(train);
+        }
+        stationTrainMapper.updateStationTrainTelecode(stationTrain.getStationTrainCode(), stationTrain.getStationTelecode(), stationTrain.getStationNo(), updateStationTelecode);
+        return true;
     }
 }

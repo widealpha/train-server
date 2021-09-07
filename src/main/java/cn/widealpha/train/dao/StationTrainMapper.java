@@ -62,6 +62,14 @@ public interface StationTrainMapper {
             "WHERE station_telecode = #{stationTelecode} AND station_telecode = #{stationTelecode} AND station_no = #{stationNo}")
     boolean updateStationTrain(StationTrain stationTrain);
 
+    @Update("UPDATE station_train " +
+            "SET station_telecode = #{updateStationTrainTelecode} " +
+            "WHERE station_telecode = #{stationTelecode} AND station_telecode = #{stationTelecode} AND station_no = #{stationNo}")
+    boolean updateStationTrainTelecode(String stationTrainCode, String stationTelecode, int stationNo, String updateStationTrainTelecode);
+
+    @Select("SELECT station_no FROM station_train WHERE station_train_code = #{stationTrainCode} ORDER BY station_no")
+    List<Integer> selectStationNos(String stationTrainCode);
+
     @Delete("DELETE FROM station_train WHERE station_train_code = #{stationTrainCode}")
     Integer deleteStationTrainByStationTrainCode(String stationTrainCode);
 }

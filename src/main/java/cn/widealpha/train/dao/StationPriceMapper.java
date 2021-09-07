@@ -27,4 +27,7 @@ public interface StationPriceMapper {
 
     @Update("UPDATE station_price SET price = price * #{ratio} WHERE train_class_code = #{trainClassCode}")
     Integer updateTrainClassPriceRatio(String trainClassCode, double ratio);
+
+    @Update("UPDATE station_price SET price = price * #{ratio} WHERE start_station_telecode = #{startStationTelecode} AND end_station_telecode = #{endStationTelecode}")
+    Integer updateStationPriceRatio(String startStationTelecode, String endStationTelecode, double ratio);
 }

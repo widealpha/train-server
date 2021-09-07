@@ -7,6 +7,7 @@ import cn.widealpha.train.domain.Coach;
 import cn.widealpha.train.domain.StationWay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
 import java.math.BigInteger;
@@ -37,7 +38,7 @@ public class CoachService {
         return coachList;
     }
 
-    @Transient
+    @Transactional
     public boolean updateCoach(int coachId, int seatCount, String seatTypeCode){
         BigInteger seat = BigInteger.ZERO;
         for (int i = 0; i < seatCount; i++) {
@@ -49,7 +50,7 @@ public class CoachService {
     }
 
 
-    @Transient
+    @Transactional
     public boolean addCoach(int coachNo, int seatCount, String seatTypeCode, String stationTrainCode){
         BigInteger seat = BigInteger.ZERO;
         for (int i = 0; i < seatCount; i++) {
@@ -81,7 +82,7 @@ public class CoachService {
         return true;
     }
 
-    @Transient
+    @Transactional
     public boolean deleteCoach(int coachId) {
         if (coachMapper.deleteCoachByCoachId(coachId)) {
             return stationWayMapper.deleteStationWayByCoachId(coachId);

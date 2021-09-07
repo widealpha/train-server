@@ -8,6 +8,7 @@ import cn.widealpha.train.util.UserUtil;
 import com.alipay.api.AlipayApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
 import java.math.BigInteger;
@@ -109,7 +110,7 @@ public class TicketService {
         return trainTicketRemains;
     }
 
-    @Transient
+    @Transactional
     public ResultEntity buyTicket(String startTelecode, String endTelecode, String stationTrainCode, String seatTypeCode, int passengerId, boolean student, String date, Character preferSeat) {
         if (UserUtil.getCurrentUserId() == null) {
             return ResultEntity.error(StatusCode.USER_NOT_LOGIN);
@@ -280,7 +281,7 @@ public class TicketService {
         return ResultEntity.error(StatusCode.NO_FREE_TICKET);
     }
 
-    @Transient
+    @Transactional
     public StatusCode cancelTicket(int ticketId) {
         Ticket ticket = ticketMapper.selectTicketByTicketId(ticketId);
         if (ticket == null) {
@@ -313,7 +314,7 @@ public class TicketService {
         }
     }
 
-    @Transient
+    @Transactional
     public ResultEntity changeTicket(int ticketId, String stationTrainCode) {
         if (UserUtil.getCurrentUserId() == null) {
             return ResultEntity.error(StatusCode.NO_PERMISSION);

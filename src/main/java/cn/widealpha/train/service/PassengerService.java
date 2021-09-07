@@ -6,6 +6,7 @@ import cn.widealpha.train.domain.Passenger;
 import cn.widealpha.train.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class PassengerService {
     @Autowired
     PassengerMapper passengerMapper;
 
-    @Transient
+    @Transactional
     public Passenger addPassenger(Passenger passenger) {
         if (UserUtil.getCurrentUserId() != null) {
             Integer passengerId = passengerMapper.existPassenger(passenger.getIdCardNo());
