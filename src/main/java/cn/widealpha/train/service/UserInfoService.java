@@ -39,8 +39,10 @@ public class UserInfoService {
                 Passenger passenger = passengerMapper.selectPassengersByPassengerId(passengerId);
                 if (Objects.equals(passenger.getName(), userInfo.getRealName())){
                     userInfo.setSelfPassengerId(passengerId);
+                    try {
+                        passengerMapper.insertPassengerUserLink(passengerId, UserUtil.getCurrentUserId());
+                    } catch (Exception ignore) {}
                 }
-                passengerMapper.insertPassengerUserLink(passengerId, UserUtil.getCurrentUserId());
             } else {
                 Passenger passenger = new Passenger();
                 passenger.setName(userInfo.getRealName());
