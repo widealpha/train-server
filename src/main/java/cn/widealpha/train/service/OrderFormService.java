@@ -32,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.sun.deploy.uitoolkit.impl.awt.AWTClientPrintHelper.print;
 
 @Service
 public class OrderFormService {

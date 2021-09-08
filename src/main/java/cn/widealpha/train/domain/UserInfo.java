@@ -19,6 +19,8 @@ public class UserInfo {
 
     private Integer selfPassengerId;
 
+    private String idCardNo;
+
     public Integer getGender() {
         return gender;
     }
@@ -89,5 +91,13 @@ public class UserInfo {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 }

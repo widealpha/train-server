@@ -2,7 +2,9 @@ package cn.widealpha.train.service;
 
 import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.dao.PassengerMapper;
+import cn.widealpha.train.dao.UserInfoMapper;
 import cn.widealpha.train.domain.Passenger;
+import cn.widealpha.train.domain.UserInfo;
 import cn.widealpha.train.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ import java.util.List;
 public class PassengerService {
     @Autowired
     PassengerMapper passengerMapper;
+    @Autowired
+    UserInfoMapper userInfoMapper;
 
     @Transactional
     public Passenger addPassenger(Passenger passenger) {
@@ -52,7 +56,12 @@ public class PassengerService {
 
     public List<Passenger> myPassengers() {
         if (UserUtil.getCurrentUserId() != null) {
-            return passengerMapper.selectPassengersByUserId(UserUtil.getCurrentUserId());
+            UserInfo userInfo = userInfoMapper.selectByUserId(UserUtil.getCurrentUserId());
+            List<Passenger> passengers = passengerMapper.selectPassengersByUserId(UserUtil.getCurrentUserId());
+            if (userInfo!= null && userInfo.getSelfPassengerId() != null){
+                passengers.add(passengerMapper.selectPassengersByPassengerId(userInfo.getSelfPassengerId()));
+            }
+            return passengers;
         }
         return new ArrayList<>();
     }
