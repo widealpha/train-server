@@ -6,7 +6,7 @@ public class Coach {
 
   private Integer coachId;
   private Integer coachNo;
-  private String stationTrainCode;
+  private String trainCode;
   private String seatTypeCode;
   private BigInteger seat;
   private Integer seatCount;
@@ -30,12 +30,12 @@ public class Coach {
   }
 
 
-  public String getStationTrainCode() {
-    return stationTrainCode;
+  public String getTrainCode() {
+    return trainCode;
   }
 
-  public void setStationTrainCode(String stationTrainCode) {
-    this.stationTrainCode = stationTrainCode;
+  public void setTrainCode(String trainCode) {
+    this.trainCode = trainCode;
   }
 
 

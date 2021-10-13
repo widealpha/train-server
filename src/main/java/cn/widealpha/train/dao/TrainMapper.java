@@ -8,15 +8,15 @@ import java.util.List;
 
 @Mapper
 public interface TrainMapper {
-    @Select("SELECT distinct station_train_code from train.train")
-    List<String> allStationTrainCode();
+    @Select("SELECT distinct train_code from train.train")
+    List<String> allTrainCode();
 
-    @Select("SELECT * FROM train WHERE station_train_code = #{stationTrainCode}")
-    Train selectTrainByStationTrainCode(String stationTrainCode);
+    @Select("SELECT * FROM train WHERE train_code = #{trainCode}")
+    Train selectTrainByTrainCode(String trainCode);
 
     @Lang(MybatisExtendedLanguageDriver.class)
-    @Select("SELECT distinct * FROM train WHERE station_train_code IN (#{stationTrainCodes})")
-    List<Train> selectTrainsByStationTrainCodes(List<String> stationTrainCodes);
+    @Select("SELECT distinct * FROM train WHERE train_code IN (#{trainCodes})")
+    List<Train> selectTrainsByTrainCodes(List<String> trainCodes);
 
     @Select("SELECT * FROM train LIMIT #{page}, #{size}")
     List<Train> selectTrains(int page, int size);
@@ -32,16 +32,16 @@ public interface TrainMapper {
             "end_arrive_time = #{endArriveTime}, train_type_code = #{trainTypeCode}, " +
             "train_class_code = #{trainClassCode}, seat_types = #{seatTypes}, " +
             "start_date = #{startDate}, stop_date = #{stopDate} " +
-            "WHERE station_train_code = #{stationTrainCode}")
-    boolean updateTrainByStationTrainCode(Train train);
+            "WHERE train_code = #{trainCode}")
+    boolean updateTrainByTrainCode(Train train);
 
     @Insert("INSERT INTO train " +
-            "(train_no, station_train_code, start_station_telecode, start_start_time, " +
+            "(train_no, train_code, start_station_telecode, start_start_time, " +
             "end_station_telecode, end_arrive_time, train_type_code, train_class_code, seat_types, start_date, stop_date) " +
-            "VALUES (#{trainNo}, #{stationTrainCode}, #{startStationTelecode}, #{startStartTime}, " +
+            "VALUES (#{trainNo}, #{trainCode}, #{startStationTelecode}, #{startStartTime}, " +
             "#{endStationTelecode}, #{endArriveTime}, #{trainTypeCode}, #{trainClassCode}, #{seatTypes}, #{startDate}, #{stopDate})")
     boolean insertTrain(Train train);
 
-    @Delete("DELETE FROM train WHERE station_train_code = #{stationTrainCode}")
-    boolean deleteTrainByStationTrainCode(String stationTrainCode);
+    @Delete("DELETE FROM train WHERE train_code = #{trainCode}")
+    boolean deleteTrainByTrainCode(String trainCode);
 }

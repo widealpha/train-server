@@ -9,8 +9,8 @@ import java.util.List;
 public interface TicketMapper {
     @Options(useGeneratedKeys = true,keyProperty = "ticketId")
     @Insert("INSERT INTO " +
-            "ticket (coach_id, seat, station_train_code, start_station_telecode, end_station_telecode, start_time, end_time, price, passenger_id, student, order_id) " +
-            "VALUES (#{coachId}, #{seat}, #{stationTrainCode}, #{startStationTelecode}, #{endStationTelecode}, #{startTime}, #{endTime}, #{price}, #{passengerId}, #{student}, #{orderId})")
+            "ticket (coach_id, seat, train_code, start_station_telecode, end_station_telecode, start_time, end_time, price, passenger_id, student, order_id) " +
+            "VALUES (#{coachId}, #{seat}, #{trainCode}, #{startStationTelecode}, #{endStationTelecode}, #{startTime}, #{endTime}, #{price}, #{passengerId}, #{student}, #{orderId})")
     Integer insertTicket(Ticket ticket);
 
     @Update("UPDATE ticket SET order_id = #{orderId} WHERE ticket_id = #{ticketId}")

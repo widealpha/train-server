@@ -3,7 +3,6 @@ package cn.widealpha.train.domain;
 import java.sql.Timestamp;
 
 public class OrderForm {
-
     private Integer orderId;
     private Integer userId;
     private Integer payed;

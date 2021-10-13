@@ -5,12 +5,10 @@ import cn.widealpha.train.bean.StatusCode;
 import cn.widealpha.train.dao.*;
 import cn.widealpha.train.domain.*;
 import cn.widealpha.train.util.UserUtil;
-import com.alipay.api.AlipayApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -52,13 +50,13 @@ public class TicketService {
 
     public List<TrainTicketRemain> trainTicketRemain(String startTelecode, String endTelecode, String stationTrainCode, String date) {
         List<TrainTicketRemain> trainTicketRemains = new ArrayList<>();
-        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         if (train == null) {
             return new ArrayList<>();
         }
-        TrainClass trainClass = trainClassMapper.selectTrainClassByTrainCode(train.getTrainClassCode());
-        List<Coach> coachList = coachMapper.selectCoachByStationTrainCode(stationTrainCode);
-        List<SeatType> seatTypes = seatTypeMapper.selectSeatTypeByStationTrainCode(stationTrainCode);
+        TrainClass trainClass = trainClassMapper.selectTrainClassByClassCode(train.getTrainClassCode());
+        List<Coach> coachList = coachMapper.selectCoachByTrainCode(stationTrainCode);
+        List<SeatType> seatTypes = seatTypeMapper.selectSeatTypeByTrainCode(stationTrainCode);
         List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStartEndCode(startTelecode, endTelecode, stationTrainCode);
         if (stationTrains.size() <= 1) {
             return new ArrayList<>();
@@ -66,7 +64,7 @@ public class TicketService {
         //根据车座位类型初始化剩余座位表
         for (SeatType seatType : seatTypes) {
             TrainTicketRemain trainTicketRemain = new TrainTicketRemain();
-            trainTicketRemain.setStationTrainCode(stationTrainCode);
+            trainTicketRemain.setTrainCode(stationTrainCode);
             trainTicketRemain.setTrainClassCode(trainClass.getTrainClassCode());
             trainTicketRemain.setTrainClassName(trainClass.getTrainClassName());
             trainTicketRemain.setSeatTypeCode(seatType.getSeatTypeCode());
@@ -135,11 +133,11 @@ public class TicketService {
         if (passenger == null) {
             return ResultEntity.error(StatusCode.NO_PASSENGER);
         }
-        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         if (train == null) {
             return ResultEntity.error(StatusCode.NO_TRAIN);
         }
-        List<Coach> coachList = coachMapper.selectCoachByStationTrainCodeAndSeatType(stationTrainCode, seatTypeCode);
+        List<Coach> coachList = coachMapper.selectCoachByTrainCodeAndSeatType(stationTrainCode, seatTypeCode);
         List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStartEndCode(startTelecode, endTelecode, stationTrainCode);
         if (stationTrains.size() <= 1) {
             return ResultEntity.error(StatusCode.NO_TRAIN);

@@ -15,13 +15,6 @@ public interface StationPriceMapper {
             "AND train_class_code = #{trainClassCode}")
     List<StationPrice> selectStationPrice(String startStationTelecode, String endStationTelecode, String trainClassCode);
 
-    @Update("UPDATE station_price SET price = #{price} " +
-            "WHERE start_station_telecode = #{startStationTelecode} " +
-            "AND end_station_telecode = #{endStationTelecode} " +
-            "AND train_class_code = #{trainClassCode} " +
-            "AND seat_type_code = #{seatTypeCode}")
-    Integer updateStationPrice(StationPrice stationPrice);
-
     @Update("UPDATE station_price SET price = price * #{ratio} WHERE seat_type_code = #{seatTypeCode}")
     Integer updateSeatPriceRatio(String seatTypeCode, double ratio);
 

@@ -13,8 +13,8 @@ public interface SeatTypeMapper {
     @Select("SELECT distinct * FROM seat_type")
     List<SeatType> selectSeatTypes();
 
-    @Select("SELECT * FROM seat_type WHERE seat_type_code IN (SELECT distinct seat_type_code FROM coach WHERE station_train_code = #{stationTrainCode})")
-    List<SeatType> selectSeatTypeByStationTrainCode(String stationTrainCode);
+    @Select("SELECT * FROM seat_type WHERE seat_type_code IN (SELECT distinct seat_type_code FROM coach WHERE train_code = #{trainCode})")
+    List<SeatType> selectSeatTypeByTrainCode(String trainCode);
 
     @Insert("INSERT IGNORE INTO seat_type " +
             "(seat_type_code, seat_type_name) VALUES (#{seatTypeCode}, #{seatTypeName})")

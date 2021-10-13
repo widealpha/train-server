@@ -2,7 +2,7 @@ package cn.widealpha.train.domain;
 
 public class StationTrain {
 
-  private String stationTrainCode;
+  private String trainCode;
   private String stationTelecode;
   private Integer arriveDayDiff;
   private java.sql.Time arriveTime;
@@ -13,12 +13,12 @@ public class StationTrain {
   private Integer stationNo;
 
 
-  public String getStationTrainCode() {
-    return stationTrainCode;
+  public String getTrainCode() {
+    return trainCode;
   }
 
-  public void setStationTrainCode(String stationTrainCode) {
-    this.stationTrainCode = stationTrainCode;
+  public void setTrainCode(String trainCode) {
+    this.trainCode = trainCode;
   }
 
 

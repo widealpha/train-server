@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,7 +28,7 @@ public class CoachService {
     }
 
     public List<Coach> getCoachByStationTrainCode(String stationTrainCode){
-        List<Coach> coachList = coachMapper.selectCoachByStationTrainCode(stationTrainCode);
+        List<Coach> coachList = coachMapper.selectCoachByTrainCode(stationTrainCode);
         for(Coach coach : coachList){
             coach.setSeatCount(coach.getSeat().bitCount());
         }
@@ -60,9 +57,9 @@ public class CoachService {
         coach.setCoachNo(coachNo);
         coach.setSeat(seat);
         coach.setSeatTypeCode(seatTypeCode);
-        coach.setStationTrainCode(stationTrainCode);
+        coach.setTrainCode(stationTrainCode);
         if (coachMapper.insertCoach(coach) > 0){
-            List<String> stations = stationTrainMapper.selectTelecodeByStationTrain(coach.getStationTrainCode());
+            List<String> stations = stationTrainMapper.selectTelecodeByStationTrain(coach.getTrainCode());
             String lastStation = null;
             for (String station : stations) {
                 if (lastStation == null) {

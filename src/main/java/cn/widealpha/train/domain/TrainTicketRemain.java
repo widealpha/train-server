@@ -5,7 +5,7 @@ public class TrainTicketRemain {
     private String startStationTelecode;
     private String endStationTelecode;
     private Integer remaining;
-    private String stationTrainCode;
+    private String trainCode;
     private String trainClassCode;
     private String trainClassName;
     private String seatTypeCode;
@@ -36,12 +36,12 @@ public class TrainTicketRemain {
         this.remaining = remaining;
     }
 
-    public String getStationTrainCode() {
-        return stationTrainCode;
+    public String getTrainCode() {
+        return trainCode;
     }
 
-    public void setStationTrainCode(String stationTrainCode) {
-        this.stationTrainCode = stationTrainCode;
+    public void setTrainCode(String trainCode) {
+        this.trainCode = trainCode;
     }
 
     public String getSeatTypeCode() {

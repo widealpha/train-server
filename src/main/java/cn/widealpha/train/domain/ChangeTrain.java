@@ -3,29 +3,29 @@ package cn.widealpha.train.domain;
 import java.sql.Time;
 
 public class ChangeTrain {
-    private String firstStationTrainCode;
+    private String firstTrainCode;
     private Time firstTrainArriveTime;
-    private String lastStationTrainCode;
+    private String lastTrainCode;
     private Time lastTrainStartTime;
     private String changeStation;
     private Integer interval;
     private Train firstTrain;
     private Train lastTrain;
 
-    public String getFirstStationTrainCode() {
-        return firstStationTrainCode;
+    public String getFirstTrainCode() {
+        return firstTrainCode;
     }
 
-    public void setFirstStationTrainCode(String firstStationTrainCode) {
-        this.firstStationTrainCode = firstStationTrainCode;
+    public void setFirstTrainCode(String firstTrainCode) {
+        this.firstTrainCode = firstTrainCode;
     }
 
-    public String getLastStationTrainCode() {
-        return lastStationTrainCode;
+    public String getLastTrainCode() {
+        return lastTrainCode;
     }
 
-    public void setLastStationTrainCode(String lastStationTrainCode) {
-        this.lastStationTrainCode = lastStationTrainCode;
+    public void setLastTrainCode(String lastTrainCode) {
+        this.lastTrainCode = lastTrainCode;
     }
 
     public String getChangeStation() {

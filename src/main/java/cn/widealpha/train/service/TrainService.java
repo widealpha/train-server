@@ -6,9 +6,7 @@ import cn.widealpha.train.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.beans.Transient;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -39,7 +37,7 @@ public class TrainService {
     TicketService ticketService;
 
     public List<String> allStationTrainCode() {
-        return trainMapper.allStationTrainCode();
+        return trainMapper.allTrainCode();
     }
 
     public Pager<Train> getTrains(int page, int size) {
@@ -57,16 +55,16 @@ public class TrainService {
         pager.setTotal(count);
         List<Train> trains = trainMapper.selectTrains(page, size);
         for (Train train : trains) {
-            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getTrainCode()));
         }
         pager.setRows(trains);
         return pager;
     }
 
     public Train getTrainByName(String stationTrainCode) {
-        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         if (train != null) {
-            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getTrainCode()));
         }
         return train;
     }
@@ -79,11 +77,11 @@ public class TrainService {
         endSameStations.add(endStationTelecode);
         for (String start : startSameStations) {
             for (String end : endSameStations) {
-                List<String> trainCodes = stationTrainMapper.selectStationTrainCodeByStartEnd(start, end);
+                List<String> trainCodes = stationTrainMapper.selectTrainCodeByStartEnd(start, end);
                 if (!trainCodes.isEmpty()) {
-                    List<Train> trainList = trainMapper.selectTrainsByStationTrainCodes(trainCodes);
+                    List<Train> trainList = trainMapper.selectTrainsByTrainCodes(trainCodes);
                     for (Train train : trainList) {
-                        train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getStationTrainCode()));
+                        train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getTrainCode()));
                         train.setNowStartStationTelecode(start);
                         train.setNowEndStationTelecode(end);
                     }
@@ -102,11 +100,11 @@ public class TrainService {
         //取出数据库设置的最大换乘数量
         SystemSetting systemSetting = systemSettingMapper.selectSystemSetting();
         List<ChangeTrain> changeTrains = new ArrayList<>();
-        List<String> trains = stationTrainMapper.selectStationTrainCodeByStationTelecode(startStationTelecode);
+        List<String> trains = stationTrainMapper.selectTrainCodeByStationTelecode(startStationTelecode);
         Set<String> passStation = new HashSet<>();
         //遍历所有列车取得可能换乘的车站
         for (String train : trains) {
-            passStation.addAll(stationTrainMapper.selectTelecodeByStationTrainAfter(train, startStationTelecode));
+            passStation.addAll(stationTrainMapper.selectTelecodeByTrainAfter(train, startStationTelecode));
         }
         for (String station : passStation) {
             List<StationTrain> firstTrains = stationTrainMapper.selectStationTrainByStartEnd(startStationTelecode, station);
@@ -145,18 +143,18 @@ public class TrainService {
                         ChangeTrain changeTrain = new ChangeTrain();
                         changeTrain.setChangeStation(station);
 
-                        changeTrain.setFirstStationTrainCode(first.getStationTrainCode());
-                        Train firstTrain = trainMapper.selectTrainByStationTrainCode(first.getStationTrainCode());
+                        changeTrain.setFirstTrainCode(first.getTrainCode());
+                        Train firstTrain = trainMapper.selectTrainByTrainCode(first.getTrainCode());
                         firstTrain.setNowStartStationTelecode(startStationTelecode);
                         firstTrain.setNowEndStationTelecode(station);
-                        firstTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(first.getStationTrainCode()));
+                        firstTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(first.getTrainCode()));
                         changeTrain.setFirstTrain(firstTrain);
 
-                        changeTrain.setLastStationTrainCode(last.getStationTrainCode());
-                        Train lastTrain = trainMapper.selectTrainByStationTrainCode(last.getStationTrainCode());
+                        changeTrain.setLastTrainCode(last.getTrainCode());
+                        Train lastTrain = trainMapper.selectTrainByTrainCode(last.getTrainCode());
                         lastTrain.setNowStartStationTelecode(station);
                         lastTrain.setNowEndStationTelecode(endStationTelecode);
-                        lastTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(last.getStationTrainCode()));
+                        lastTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(last.getTrainCode()));
                         changeTrain.setLastTrain(lastTrain);
 
                         changeTrain.setFirstTrainArriveTime(first.getArriveTime());
@@ -168,8 +166,8 @@ public class TrainService {
                         }
                         boolean shouldAdd = true;
                         for (ChangeTrain c : changeTrains) {
-                            if (c.getFirstStationTrainCode().equals(changeTrain.getFirstStationTrainCode())
-                                    && c.getLastStationTrainCode().equals(changeTrain.getLastStationTrainCode())) {
+                            if (c.getFirstTrainCode().equals(changeTrain.getFirstTrainCode())
+                                    && c.getLastTrainCode().equals(changeTrain.getLastTrainCode())) {
                                 shouldAdd = false;
                                 break;
                             }
@@ -186,12 +184,12 @@ public class TrainService {
 
     public List<TrainPrice> trainPrice(String startTelecode, String endTelecode, String stationTrainCode) {
         List<TrainPrice> trainPrices = new ArrayList<>();
-        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         if (train == null) {
             return new ArrayList<>();
         }
-        TrainClass trainClass = trainClassMapper.selectTrainClassByTrainCode(train.getTrainClassCode());
-        List<SeatType> seatTypes = seatTypeMapper.selectSeatTypeByStationTrainCode(stationTrainCode);
+        TrainClass trainClass = trainClassMapper.selectTrainClassByClassCode(train.getTrainClassCode());
+        List<SeatType> seatTypes = seatTypeMapper.selectSeatTypeByTrainCode(stationTrainCode);
         List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStartEndCode(startTelecode, endTelecode, stationTrainCode);
         if (stationTrains.size() <= 1) {
             return new ArrayList<>();
@@ -199,7 +197,7 @@ public class TrainService {
         //根据车座位类型初始化价格表
         for (SeatType seatType : seatTypes) {
             TrainPrice trainPrice = new TrainPrice();
-            trainPrice.setStationTrainCode(stationTrainCode);
+            trainPrice.setTrainCode(stationTrainCode);
             trainPrice.setTrainClassCode(trainClass.getTrainClassCode());
             trainPrice.setTrainClassName(trainClass.getTrainClassName());
             trainPrice.setSeatTypeCode(seatType.getSeatTypeCode());
@@ -233,15 +231,15 @@ public class TrainService {
     }
 
     public boolean stopTrain(String stationTrainCode) {
-        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         train.setStopDate(Date.valueOf("2000-01-01"));
-        return trainMapper.updateTrainByStationTrainCode(train);
+        return trainMapper.updateTrainByTrainCode(train);
     }
 
     public boolean startTrain(String stationTrainCode) {
-        Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+        Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         train.setStopDate(Date.valueOf("2100-01-01"));
-        return trainMapper.updateTrainByStationTrainCode(train);
+        return trainMapper.updateTrainByTrainCode(train);
     }
 
     @Transactional
@@ -271,15 +269,15 @@ public class TrainService {
         StationTrain stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, stationTelecode, stationNo);
         List<Integer> stationNos = stationTrainMapper.selectStationNos(stationTrainCode);
         if (stationNo == stationNos.get(0)) {
-            Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+            Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
             train.setStartStationTelecode(updateStationTelecode);
-            trainMapper.updateTrainByStationTrainCode(train);
+            trainMapper.updateTrainByTrainCode(train);
         } else if (stationNo == stationNos.get(stationNos.size() - 1)) {
-            Train train = trainMapper.selectTrainByStationTrainCode(stationTrainCode);
+            Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
             train.setEndStationTelecode(updateStationTelecode);
-            trainMapper.updateTrainByStationTrainCode(train);
+            trainMapper.updateTrainByTrainCode(train);
         }
-        stationTrainMapper.updateStationTrainTelecode(stationTrain.getStationTrainCode(), stationTrain.getStationTelecode(), stationTrain.getStationNo(), updateStationTelecode);
+        stationTrainMapper.updateStationTrainTelecode(stationTrain.getTrainCode(), stationTrain.getStationTelecode(), updateStationTelecode);
         stationTrain = stationTrainMapper.selectStationTrainByKey(stationTrainCode, updateStationTelecode, stationNo);
         stationTrain.setStartTime(Time.valueOf(startTime + ":00"));
         stationTrain.setArriveTime(Time.valueOf(arriveTime + ":00"));
@@ -301,9 +299,9 @@ public class TrainService {
             return false;
         }
         for (int i = 1; i < stationTrains.size() - 1; i++) {
-            if (stationTrains.get(i).getStationTrainCode().equals(stationTrainCode)) {
-                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTrains.get(i - 1).getStationTrainCode(), stationTelecode, stationTrainCode);
-                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTelecode, stationTrains.get(i + 1).getStationTrainCode(), stationTrainCode);
+            if (stationTrains.get(i).getTrainCode().equals(stationTrainCode)) {
+                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTrains.get(i - 1).getTrainCode(), stationTelecode, stationTrainCode);
+                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTelecode, stationTrains.get(i + 1).getTrainCode(), stationTrainCode);
                 stationTrainMapper.deleteStationTrainByKey(stationTrainCode, stationTelecode);
                 return true;
             }
@@ -317,7 +315,7 @@ public class TrainService {
         for (int i = 0; i < stationTrains.size() - 1; i++) {
             if (stationTrains.get(i).getStationNo() < stationNo && stationTrains.get(i + 1).getStationNo() > stationNo) {
                 StationTrain stationTrain = new StationTrain();
-                stationTrain.setStationTrainCode(stationTrainCode);
+                stationTrain.setTrainCode(stationTrainCode);
                 stationTrain.setStationTelecode(stationTelecode);
                 stationTrain.setStartTime(Time.valueOf(startTime + ":00"));
                 stationTrain.setArriveTime(Time.valueOf(arriveTime + ":00"));
@@ -325,17 +323,17 @@ public class TrainService {
                 stationTrain.setArriveDayDiff(arriveDayDiff);
                 stationTrain.setStationNo(stationNo);
                 stationTrainMapper.insertStationTrain(stationTrain);
-                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTrains.get(i).getStationTrainCode(), stationTrains.get(i + 1).getStationTrainCode(), stationTrainCode);
-                List<Coach> coachList = coachMapper.selectCoachByStationTrainCode(stationTrainCode);
+                stationWayMapper.deleteStationWayByKeyAndStationTrainCode(stationTrains.get(i).getTrainCode(), stationTrains.get(i + 1).getTrainCode(), stationTrainCode);
+                List<Coach> coachList = coachMapper.selectCoachByTrainCode(stationTrainCode);
                 for (Coach coach : coachList) {
                     StationWay stationWay = new StationWay();
                     stationWay.setCoachId(coach.getCoachId());
                     stationWay.setSeat(coach.getSeat());
-                    stationWay.setStartStationTelecode(stationTrains.get(i).getStationTrainCode());
+                    stationWay.setStartStationTelecode(stationTrains.get(i).getTrainCode());
                     stationWay.setEndStationTelecode(stationTelecode);
                     stationWayMapper.insertStationWay(stationWay);
                     stationWay.setStartStationTelecode(stationTelecode);
-                    stationWay.setEndStationTelecode(stationTrains.get(i + 1).getStationTrainCode());
+                    stationWay.setEndStationTelecode(stationTrains.get(i + 1).getTrainCode());
                     stationWayMapper.insertStationWay(stationWay);
                 }
                 return true;
@@ -348,7 +346,7 @@ public class TrainService {
     public boolean addTrain(String stationTrainCode, String startStationTelecode, String endStationTelecode, String startTime, String endTime, int arriveDayDiff) {
         Train train = new Train();
         train.setTrainNo("0000000" + stationTrainCode);
-        train.setStationTrainCode(stationTrainCode);
+        train.setTrainCode(stationTrainCode);
         train.setStartStationTelecode(startStationTelecode);
         train.setEndStationTelecode(endStationTelecode);
         train.setStartStartTime(Time.valueOf(startTime + ":00"));
@@ -363,7 +361,7 @@ public class TrainService {
         }
         trainMapper.insertTrain(train);
         StationTrain stationTrain = new StationTrain();
-        stationTrain.setStationTrainCode(stationTrainCode);
+        stationTrain.setTrainCode(stationTrainCode);
         stationTrain.setStationTelecode(startStationTelecode);
         stationTrain.setStartTime(Time.valueOf(startTime + ":00"));
         stationTrain.setArriveTime(Time.valueOf(startTime + ":00"));

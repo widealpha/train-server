@@ -1,7 +1,7 @@
 package cn.widealpha.train.domain;
 
 public class TrainPrice {
-    private String stationTrainCode;
+    private String trainCode;
     private String seatTypeCode;
     private String seatTypeName;
     private String trainClassCode;
@@ -10,12 +10,12 @@ public class TrainPrice {
     private String startStationTelecode;
     private String endStationTelecode;
 
-    public String getStationTrainCode() {
-        return stationTrainCode;
+    public String getTrainCode() {
+        return trainCode;
     }
 
-    public void setStationTrainCode(String stationTrainCode) {
-        this.stationTrainCode = stationTrainCode;
+    public void setTrainCode(String trainCode) {
+        this.trainCode = trainCode;
     }
 
     public String getSeatTypeCode() {

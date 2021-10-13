@@ -214,7 +214,7 @@ public class OrderFormService {
         for (OrderForm orderForm : orderForms) {
             List<Ticket> tickets = ticketMapper.selectTicketByOrderFormId(orderForm.getOrderId());
             for (Ticket ticket : tickets) {
-                Train train = trainMapper.selectTrainByStationTrainCode(ticket.getStationTrainCode());
+                Train train = trainMapper.selectTrainByTrainCode(ticket.getStationTrainCode());
                 if (sealMap.containsKey(train.getTrainClassCode())){
                     sealMap.put(train.getTrainClassCode(), sealMap.get(train.getTrainClassCode()) + 1);
                 } else {

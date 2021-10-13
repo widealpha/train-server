@@ -14,7 +14,7 @@ public interface TrainClassMapper {
     boolean existTrainClassCode(String trainClassCode);
 
     @Select("SELECT * FROM train_class WHERE train_class_code = #{trainClassCode}")
-    TrainClass selectTrainClassByTrainCode(String trainClassCode);
+    TrainClass selectTrainClassByClassCode(String trainClassCode);
 
     @Select("SELECT * FROM train_class")
     List<TrainClass> selectAllTrainClass();
