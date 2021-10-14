@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `coach`;
 CREATE TABLE `coach` (
   `coach_id` int NOT NULL AUTO_INCREMENT,
   `coach_no` int DEFAULT NULL,
-  `station_train_code` varchar(20) DEFAULT NULL,
+  `train_code` varchar(20) DEFAULT NULL,
   `seat_type_code` varchar(10) DEFAULT NULL,
   `seat` bigint unsigned NOT NULL DEFAULT '18446744073709551615',
   PRIMARY KEY (`coach_id`)
@@ -46,7 +46,7 @@ CREATE TABLE `order_form` (
   `time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `price` double DEFAULT NULL,
   PRIMARY KEY (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,8 +90,10 @@ DROP TABLE IF EXISTS `same_station`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `same_station` (
-  `origin` varchar(255) DEFAULT NULL,
-  `same` varchar(10) NOT NULL
+  `origin` varchar(10) NOT NULL,
+  `same` varchar(10) NOT NULL,
+  KEY `same_station_origin_index` (`origin`),
+  KEY `same_station_same_index` (`same`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -133,11 +135,12 @@ DROP TABLE IF EXISTS `station_price`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `station_price` (
-  `start_station_telecode` varchar(10) DEFAULT NULL,
-  `end_station_telecode` varchar(10) DEFAULT NULL,
+  `start_station_telecode` varchar(10) NOT NULL,
+  `end_station_telecode` varchar(10) NOT NULL,
+  `seat_type_code` varchar(10) NOT NULL,
+  `train_class_code` varchar(10) NOT NULL,
   `price` double DEFAULT NULL,
-  `train_class_code` varchar(10) DEFAULT NULL,
-  `seat_type_code` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`start_station_telecode`,`end_station_telecode`,`seat_type_code`,`train_class_code`),
   KEY `station_price_start_station_end_station_index` (`start_station_telecode`,`end_station_telecode`,`train_class_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -150,7 +153,7 @@ DROP TABLE IF EXISTS `station_train`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `station_train` (
-  `station_train_code` varchar(255) NOT NULL,
+  `train_code` varchar(255) NOT NULL,
   `station_telecode` varchar(255) NOT NULL,
   `arrive_day_diff` int DEFAULT NULL,
   `arrive_time` time DEFAULT NULL,
@@ -159,8 +162,8 @@ CREATE TABLE `station_train` (
   `update_start_time` time DEFAULT NULL,
   `start_day_diff` int DEFAULT NULL,
   `station_no` int DEFAULT NULL,
-  PRIMARY KEY (`station_train_code`,`station_telecode`),
-  KEY `station_train_station_train_code_index` (`station_train_code`)
+  PRIMARY KEY (`train_code`,`station_telecode`),
+  KEY `station_train_station_train_code_index` (`train_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -211,6 +214,7 @@ CREATE TABLE `system` (
   `start` tinyint(1) NOT NULL DEFAULT '1' COMMENT '系统状态',
   `update_time` time NOT NULL DEFAULT '08:00:00' COMMENT '车票更新时间',
   `max_transfer_calculate` int NOT NULL DEFAULT '20' COMMENT '最大返回的中转车辆数量',
+  `has_alipay_key` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -226,7 +230,7 @@ CREATE TABLE `ticket` (
   `ticket_id` int NOT NULL AUTO_INCREMENT,
   `coach_id` int NOT NULL,
   `seat` bigint NOT NULL,
-  `station_train_code` varchar(255) NOT NULL,
+  `train_code` varchar(255) NOT NULL,
   `start_station_telecode` varchar(10) NOT NULL,
   `end_station_telecode` varchar(10) NOT NULL,
   `start_time` timestamp NOT NULL,
@@ -237,7 +241,7 @@ CREATE TABLE `ticket` (
   `student` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ticket_id`),
   KEY `ticket_passenger_id_index` (`passenger_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,8 +252,8 @@ DROP TABLE IF EXISTS `train`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `train` (
+  `train_code` varchar(255) NOT NULL,
   `train_no` varchar(255) NOT NULL,
-  `station_train_code` varchar(255) NOT NULL,
   `start_station_telecode` varchar(255) NOT NULL,
   `start_start_time` time NOT NULL,
   `end_station_telecode` varchar(255) DEFAULT NULL,
@@ -259,7 +263,7 @@ CREATE TABLE `train` (
   `seat_types` varchar(20) DEFAULT NULL,
   `start_date` date NOT NULL,
   `stop_date` date NOT NULL DEFAULT '2050-12-31',
-  PRIMARY KEY (`station_train_code`)
+  PRIMARY KEY (`train_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -304,7 +308,7 @@ CREATE TABLE `user` (
   `password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_username_uindex` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -365,4 +369,4 @@ CREATE TABLE `user_role` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-09-08 20:33:32
+-- Dump completed on 2021-10-14 20:12:51
