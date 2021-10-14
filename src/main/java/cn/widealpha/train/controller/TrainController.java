@@ -1,7 +1,7 @@
 package cn.widealpha.train.controller;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
 import cn.widealpha.train.service.TicketService;
 import cn.widealpha.train.service.TrainService;
 import cn.widealpha.train.util.StringUtil;
@@ -41,8 +41,14 @@ public class TrainController {
 
     @RequestMapping("trainsBetween")
     ResultEntity trainsBetween(@RequestParam String startStationTelecode, @RequestParam String endStationTelecode, @RequestParam(required = false) String date) {
-        return ResultEntity.data(trainService.getTrainByStation(startStationTelecode, endStationTelecode, date));
+        return ResultEntity.data(trainService.getTrainByStation(startStationTelecode, endStationTelecode, date, false));
     }
+
+    @RequestMapping("trainsBetweenSimple")
+    ResultEntity trainsBetweenSimple(@RequestParam String startStationTelecode, @RequestParam String endStationTelecode, @RequestParam(required = false) String date) {
+        return ResultEntity.data(trainService.getTrainByStation(startStationTelecode, endStationTelecode, date, true));
+    }
+
 
     @RequestMapping("trainsBetweenWithChange")
     ResultEntity trainsBetweenWithChange(@RequestParam String startStationTelecode, @RequestParam String endStationTelecode, @RequestParam String date) {

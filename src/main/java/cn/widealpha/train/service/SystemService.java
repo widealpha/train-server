@@ -1,7 +1,7 @@
 package cn.widealpha.train.service;
 
 import cn.widealpha.train.dao.SystemSettingMapper;
-import cn.widealpha.train.domain.SystemSetting;
+import cn.widealpha.train.pojo.entity.SystemSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

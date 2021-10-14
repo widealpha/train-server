@@ -1,8 +1,8 @@
 package cn.widealpha.train.controller;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.domain.SeatType;
-import cn.widealpha.train.domain.TrainClass;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.pojo.entity.SeatType;
+import cn.widealpha.train.pojo.entity.TrainClass;
 import cn.widealpha.train.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -84,7 +84,7 @@ public class AdminController {
 
     @RequestMapping("deleteTrainStation")
     ResultEntity deleteTrainStation(@RequestParam String stationTrainCode, @RequestParam String stationTelecode, @RequestParam int stationNo) {
-        return ResultEntity.data(trainService.deleteTrainStation(stationTrainCode, stationTelecode, stationNo));
+        return ResultEntity.data(trainService.deleteTrainStation(stationTrainCode, stationTelecode));
     }
 
     @RequestMapping("updateTrainClassPriceRatio")

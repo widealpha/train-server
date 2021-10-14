@@ -1,6 +1,6 @@
 package cn.widealpha.train.util;
 
-import cn.widealpha.train.domain.TrainUser;
+import cn.widealpha.train.pojo.entity.TrainUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

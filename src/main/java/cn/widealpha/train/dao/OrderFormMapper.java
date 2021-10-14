@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.OrderForm;
+import cn.widealpha.train.pojo.entity.OrderForm;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

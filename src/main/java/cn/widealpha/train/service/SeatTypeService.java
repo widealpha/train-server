@@ -1,7 +1,7 @@
 package cn.widealpha.train.service;
 
 import cn.widealpha.train.dao.SeatTypeMapper;
-import cn.widealpha.train.domain.SeatType;
+import cn.widealpha.train.pojo.entity.SeatType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

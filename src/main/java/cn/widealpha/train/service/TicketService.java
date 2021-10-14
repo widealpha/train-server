@@ -1,9 +1,11 @@
 package cn.widealpha.train.service;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
 import cn.widealpha.train.dao.*;
-import cn.widealpha.train.domain.*;
+import cn.widealpha.train.pojo.bo.TrainPrice;
+import cn.widealpha.train.pojo.bo.TrainTicketRemain;
+import cn.widealpha.train.pojo.entity.*;
 import cn.widealpha.train.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

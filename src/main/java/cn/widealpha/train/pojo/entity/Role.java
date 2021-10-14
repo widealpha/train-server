@@ -1,4 +1,4 @@
-package cn.widealpha.train.domain;
+package cn.widealpha.train.pojo.entity;
 
 public class Role {
     public static final String SYSTEM = "ROLE_SYSTEM";

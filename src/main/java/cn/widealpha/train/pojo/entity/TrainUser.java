@@ -1,4 +1,4 @@
-package cn.widealpha.train.domain;
+package cn.widealpha.train.pojo.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;

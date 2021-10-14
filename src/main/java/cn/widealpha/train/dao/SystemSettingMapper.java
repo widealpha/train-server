@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.SystemSetting;
+import cn.widealpha.train.pojo.entity.SystemSetting;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;

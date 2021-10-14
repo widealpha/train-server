@@ -1,6 +1,4 @@
-package cn.widealpha.train.domain;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+package cn.widealpha.train.pojo.entity;
 
 import java.math.BigInteger;
 

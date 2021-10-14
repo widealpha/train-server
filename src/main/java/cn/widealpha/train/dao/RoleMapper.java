@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.Role;
+import cn.widealpha.train.pojo.entity.Role;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;

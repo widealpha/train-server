@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.StationWay;
+import cn.widealpha.train.pojo.entity.StationWay;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigInteger;

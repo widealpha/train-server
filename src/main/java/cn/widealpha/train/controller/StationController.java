@@ -1,6 +1,6 @@
 package cn.widealpha.train.controller;
 
-import cn.widealpha.train.bean.ResultEntity;
+import cn.widealpha.train.pojo.dto.ResultEntity;
 import cn.widealpha.train.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

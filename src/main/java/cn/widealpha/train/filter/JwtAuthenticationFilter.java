@@ -1,8 +1,8 @@
 package cn.widealpha.train.filter;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
-import cn.widealpha.train.domain.TrainUser;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
+import cn.widealpha.train.pojo.entity.TrainUser;
 import cn.widealpha.train.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

@@ -3,8 +3,8 @@ package cn.widealpha.train.service;
 import cn.widealpha.train.dao.CoachMapper;
 import cn.widealpha.train.dao.StationTrainMapper;
 import cn.widealpha.train.dao.StationWayMapper;
-import cn.widealpha.train.domain.Coach;
-import cn.widealpha.train.domain.StationWay;
+import cn.widealpha.train.pojo.entity.Coach;
+import cn.widealpha.train.pojo.entity.StationWay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +59,7 @@ public class CoachService {
         coach.setSeatTypeCode(seatTypeCode);
         coach.setTrainCode(stationTrainCode);
         if (coachMapper.insertCoach(coach) > 0){
-            List<String> stations = stationTrainMapper.selectTelecodeByStationTrain(coach.getTrainCode());
+            List<String> stations = stationTrainMapper.selectTelecodeByTrainCode(coach.getTrainCode());
             String lastStation = null;
             for (String station : stations) {
                 if (lastStation == null) {

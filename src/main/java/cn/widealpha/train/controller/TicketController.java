@@ -1,7 +1,7 @@
 package cn.widealpha.train.controller;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
 import cn.widealpha.train.service.TicketService;
 import cn.widealpha.train.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;

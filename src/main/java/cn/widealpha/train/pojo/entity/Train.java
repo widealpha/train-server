@@ -1,4 +1,7 @@
-package cn.widealpha.train.domain;
+package cn.widealpha.train.pojo.entity;
+
+import cn.widealpha.train.pojo.bo.TrainPrice;
+import cn.widealpha.train.pojo.bo.TrainTicketRemain;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +19,7 @@ public class Train {
   private String seatTypes;
   private java.sql.Date startDate;
   private java.sql.Date stopDate;
-  private List<StationTrain> trainStations;
+  private List<StationTrain> stationTrains;
   private String nowStartStationTelecode;
   private String nowEndStationTelecode;
   private List<TrainPrice> trainPrices;
@@ -121,11 +124,11 @@ public class Train {
   }
 
   public List<StationTrain> getTrainStations() {
-    return trainStations;
+    return stationTrains;
   }
 
-  public void setTrainStations(List<StationTrain> trainStations) {
-    this.trainStations = trainStations;
+  public void setTrainStations(List<StationTrain> stationTrains) {
+    this.stationTrains = stationTrains;
   }
 
   public String getNowStartStationTelecode() {
@@ -165,11 +168,11 @@ public class Train {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Train train = (Train) o;
-    return Objects.equals(trainNo, train.trainNo) && Objects.equals(trainCode, train.trainCode) && Objects.equals(startStationTelecode, train.startStationTelecode) && Objects.equals(startStartTime, train.startStartTime) && Objects.equals(endStationTelecode, train.endStationTelecode) && Objects.equals(endArriveTime, train.endArriveTime) && Objects.equals(trainTypeCode, train.trainTypeCode) && Objects.equals(trainClassCode, train.trainClassCode) && Objects.equals(seatTypes, train.seatTypes) && Objects.equals(startDate, train.startDate) && Objects.equals(stopDate, train.stopDate) && Objects.equals(trainStations, train.trainStations) && Objects.equals(nowStartStationTelecode, train.nowStartStationTelecode) && Objects.equals(nowEndStationTelecode, train.nowEndStationTelecode) && Objects.equals(trainPrices, train.trainPrices) && Objects.equals(trainTicketRemains, train.trainTicketRemains);
+    return Objects.equals(trainNo, train.trainNo) && Objects.equals(trainCode, train.trainCode) && Objects.equals(startStationTelecode, train.startStationTelecode) && Objects.equals(startStartTime, train.startStartTime) && Objects.equals(endStationTelecode, train.endStationTelecode) && Objects.equals(endArriveTime, train.endArriveTime) && Objects.equals(trainTypeCode, train.trainTypeCode) && Objects.equals(trainClassCode, train.trainClassCode) && Objects.equals(seatTypes, train.seatTypes) && Objects.equals(startDate, train.startDate) && Objects.equals(stopDate, train.stopDate) && Objects.equals(stationTrains, train.stationTrains) && Objects.equals(nowStartStationTelecode, train.nowStartStationTelecode) && Objects.equals(nowEndStationTelecode, train.nowEndStationTelecode) && Objects.equals(trainPrices, train.trainPrices) && Objects.equals(trainTicketRemains, train.trainTicketRemains);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(trainNo, trainCode, startStationTelecode, startStartTime, endStationTelecode, endArriveTime, trainTypeCode, trainClassCode, seatTypes, startDate, stopDate, trainStations, nowStartStationTelecode, nowEndStationTelecode, trainPrices, trainTicketRemains);
+    return Objects.hash(trainNo, trainCode, startStationTelecode, startStartTime, endStationTelecode, endArriveTime, trainTypeCode, trainClassCode, seatTypes, startDate, stopDate, stationTrains, nowStartStationTelecode, nowEndStationTelecode, trainPrices, trainTicketRemains);
   }
 }

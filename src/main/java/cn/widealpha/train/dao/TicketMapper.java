@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.Ticket;
+import cn.widealpha.train.pojo.entity.Ticket;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

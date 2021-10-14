@@ -1,4 +1,4 @@
-package cn.widealpha.train.bean;
+package cn.widealpha.train.pojo.dto;
 
 import java.util.List;
 

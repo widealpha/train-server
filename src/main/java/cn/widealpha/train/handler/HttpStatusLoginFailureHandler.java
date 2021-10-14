@@ -1,7 +1,7 @@
 package cn.widealpha.train.handler;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
 import com.alibaba.fastjson.JSON;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;

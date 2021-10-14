@@ -1,5 +1,8 @@
-package cn.widealpha.train.domain;
+package cn.widealpha.train.pojo.entity;
 
+/**
+ * 车站与火车的联系,车辆到站信息
+ */
 public class StationTrain {
 
   private String trainCode;

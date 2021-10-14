@@ -1,4 +1,6 @@
-package cn.widealpha.train.domain;
+package cn.widealpha.train.pojo.bo;
+
+import cn.widealpha.train.pojo.entity.Train;
 
 import java.sql.Time;
 
@@ -11,6 +13,7 @@ public class ChangeTrain {
     private Integer interval;
     private Train firstTrain;
     private Train lastTrain;
+    private Integer length;
 
     public String getFirstTrainCode() {
         return firstTrainCode;
@@ -74,5 +77,13 @@ public class ChangeTrain {
 
     public void setLastTrain(Train lastTrain) {
         this.lastTrain = lastTrain;
+    }
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public void setLength(Integer length) {
+        this.length = length;
     }
 }

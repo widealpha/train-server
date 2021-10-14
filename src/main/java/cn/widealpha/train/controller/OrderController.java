@@ -1,8 +1,8 @@
 package cn.widealpha.train.controller;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
-import cn.widealpha.train.domain.OrderForm;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
+import cn.widealpha.train.pojo.entity.OrderForm;
 import cn.widealpha.train.service.OrderFormService;
 import com.alipay.api.AlipayApiException;
 import org.springframework.beans.factory.annotation.Autowired;

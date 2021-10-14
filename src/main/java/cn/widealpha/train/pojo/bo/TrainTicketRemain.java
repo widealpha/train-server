@@ -1,4 +1,4 @@
-package cn.widealpha.train.domain;
+package cn.widealpha.train.pojo.bo;
 
 
 public class TrainTicketRemain {

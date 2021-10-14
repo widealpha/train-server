@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.UserInfo;
+import cn.widealpha.train.pojo.entity.UserInfo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

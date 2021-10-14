@@ -1,5 +1,6 @@
-package cn.widealpha.train.bean;
+package cn.widealpha.train.pojo.dto;
 
+import cn.widealpha.train.util.StatusCode;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 

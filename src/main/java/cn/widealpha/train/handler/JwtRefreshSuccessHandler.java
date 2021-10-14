@@ -1,6 +1,6 @@
 package cn.widealpha.train.handler;
 
-import cn.widealpha.train.domain.TrainUser;
+import cn.widealpha.train.pojo.entity.TrainUser;
 import cn.widealpha.train.util.JwtUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;

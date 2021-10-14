@@ -1,4 +1,4 @@
-package cn.widealpha.train.bean;
+package cn.widealpha.train.util;
 
 public enum StatusCode {
     /* 成功 */

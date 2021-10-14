@@ -1,7 +1,7 @@
 package cn.widealpha.train.service;
 
 import cn.widealpha.train.dao.TrainClassMapper;
-import cn.widealpha.train.domain.TrainClass;
+import cn.widealpha.train.pojo.entity.TrainClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

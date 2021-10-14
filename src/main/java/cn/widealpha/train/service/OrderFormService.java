@@ -1,16 +1,16 @@
 package cn.widealpha.train.service;
 
-import cn.widealpha.train.bean.ResultEntity;
-import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.pojo.dto.ResultEntity;
+import cn.widealpha.train.util.StatusCode;
 import cn.widealpha.train.config.AlipayConfig;
 import cn.widealpha.train.dao.OrderFormMapper;
 import cn.widealpha.train.dao.StationMapper;
 import cn.widealpha.train.dao.TicketMapper;
 import cn.widealpha.train.dao.TrainMapper;
-import cn.widealpha.train.domain.OrderForm;
-import cn.widealpha.train.domain.Station;
-import cn.widealpha.train.domain.Ticket;
-import cn.widealpha.train.domain.Train;
+import cn.widealpha.train.pojo.entity.OrderForm;
+import cn.widealpha.train.pojo.entity.Station;
+import cn.widealpha.train.pojo.entity.Ticket;
+import cn.widealpha.train.pojo.entity.Train;
 import cn.widealpha.train.util.UserUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;

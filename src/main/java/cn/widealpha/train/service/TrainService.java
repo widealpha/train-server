@@ -1,16 +1,19 @@
 package cn.widealpha.train.service;
 
-import cn.widealpha.train.bean.Pager;
+import cn.widealpha.train.pojo.bo.TrainStationTime;
+import cn.widealpha.train.pojo.dto.Pager;
 import cn.widealpha.train.dao.*;
-import cn.widealpha.train.domain.*;
+import cn.widealpha.train.pojo.bo.ChangeTrain;
+import cn.widealpha.train.pojo.bo.TrainPrice;
+import cn.widealpha.train.pojo.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -55,7 +58,7 @@ public class TrainService {
         pager.setTotal(count);
         List<Train> trains = trainMapper.selectTrains(page, size);
         for (Train train : trains) {
-            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getTrainCode()));
+            train.setTrainStations(stationTrainMapper.selectStationTrainByTrainCode(train.getTrainCode()));
         }
         pager.setRows(trains);
         return pager;
@@ -64,28 +67,48 @@ public class TrainService {
     public Train getTrainByName(String stationTrainCode) {
         Train train = trainMapper.selectTrainByTrainCode(stationTrainCode);
         if (train != null) {
-            train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getTrainCode()));
+            train.setTrainStations(stationTrainMapper.selectStationTrainByTrainCode(train.getTrainCode()));
         }
         return train;
     }
 
-    public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode, String date) {
+    /**
+     * 返回两站之间列车信息
+     *
+     * @param startStationTelecode 出发站
+     * @param endStationTelecode   终点站
+     * @param simple               是否返回简略信息
+     * @return 列车信息
+     */
+    public List<Train> getTrainByStation(String startStationTelecode, String endStationTelecode, String date, boolean simple) {
         List<Train> trains = new ArrayList<>();
+        //扩展到相似站台
         List<String> startSameStations = stationMapper.selectSameStationTelecode(startStationTelecode);
         startSameStations.add(startStationTelecode);
         List<String> endSameStations = stationMapper.selectSameStationTelecode(endStationTelecode);
         endSameStations.add(endStationTelecode);
         for (String start : startSameStations) {
             for (String end : endSameStations) {
+                // 查找所有的经过起点终点的列车号
                 List<String> trainCodes = stationTrainMapper.selectTrainCodeByStartEnd(start, end);
                 if (!trainCodes.isEmpty()) {
                     List<Train> trainList = trainMapper.selectTrainsByTrainCodes(trainCodes);
+                    List<StationTrain> stationTrainList = stationTrainMapper.selectStationTrainByTrainCodes(trainCodes);
                     for (Train train : trainList) {
-                        train.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(train.getTrainCode()));
+                        train.setTrainStations(new ArrayList<>());
+                        for (StationTrain stationTrain : stationTrainList) {
+                            if (stationTrain.getTrainCode().equals(train.getTrainCode())) {
+                                train.getTrainStations().add(stationTrain);
+                            }
+                        }
                         train.setNowStartStationTelecode(start);
                         train.setNowEndStationTelecode(end);
+                        // 简略信息不返回中途经过的站台的具体信息
+                        if (!simple) {
+                            train.setTrainStations(null);
+                        }
+                        trains.add(train);
                     }
-                    trains.addAll(trainList);
                 }
             }
         }
@@ -93,93 +116,84 @@ public class TrainService {
     }
 
     public List<StationTrain> getTrainStations(String stationTrainCode) {
-        return stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
+        return stationTrainMapper.selectStationTrainByTrainCode(stationTrainCode);
     }
 
+    /**
+     * 获取换乘信息
+     *
+     * @param startStationTelecode 起始车站
+     * @param endStationTelecode   终点车站
+     * @param date                 日期
+     * @return 返回换乘信息
+     */
     public List<ChangeTrain> getTrainsBetweenWithChange(String startStationTelecode, String endStationTelecode, String date) {
         //取出数据库设置的最大换乘数量
         SystemSetting systemSetting = systemSettingMapper.selectSystemSetting();
         List<ChangeTrain> changeTrains = new ArrayList<>();
-        List<String> trains = stationTrainMapper.selectTrainCodeByStationTelecode(startStationTelecode);
-        Set<String> passStation = new HashSet<>();
-        //遍历所有列车取得可能换乘的车站
-        for (String train : trains) {
-            passStation.addAll(stationTrainMapper.selectTelecodeByTrainAfter(train, startStationTelecode));
-        }
-        for (String station : passStation) {
-            List<StationTrain> firstTrains = stationTrainMapper.selectStationTrainByStartEnd(startStationTelecode, station);
-            List<StationTrain> lastTrains = stationTrainMapper.selectStationTrainByStartEnd(station, endStationTelecode);
-            for (StationTrain first : firstTrains) {
-                for (StationTrain last : lastTrains) {
-                    //优化效率
-                    if (changeTrains.size() > systemSetting.getMaxTransferCalculate()) {
-                        return changeTrains;
-                    }
-                    //排除始发站情况
-                    if (first.getStationNo() == 1) {
+        List<String> firstTrains = stationTrainMapper.selectTrainCodeByStationTelecode(startStationTelecode);
+        Map<String, TrainStationTime> firstTrainStartTime = stationTrainMapper.selectStartTimeByTelecode(startStationTelecode);
+        Map<String, TrainStationTime> lastTrainArriveTime = stationTrainMapper.selectArriveTimeByTelecode(endStationTelecode);
+        List<String> lastTrains = stationTrainMapper.selectTrainCodeByStationTelecode(endStationTelecode);
+        List<StationTrain> firstStationTrains = stationTrainMapper.selectStationTrainByTrainCodes(firstTrains);
+        List<StationTrain> lastStationTrains = stationTrainMapper.selectStationTrainByTrainCodes(lastTrains);
+
+        Set<Map.Entry<String, String>> containedTrainPair = new HashSet<>();
+        for (StationTrain first : firstStationTrains) {
+            for (StationTrain last : lastStationTrains) {
+                if (first.getStationTelecode().equals(last.getStationTelecode())
+                        && !first.getTrainCode().equals(last.getTrainCode())) {
+                    //排除查询到的在首发站/终点站换乘的情况
+                    if (first.getArriveTime() == null || last.getStartTime() == null
+                            || first.getStationTelecode().equals(endStationTelecode)
+                            || last.getStationTelecode().equals(startStationTelecode)) {
                         continue;
                     }
-                    if (first.getArriveTime() == null) {
-                        first.setArriveTime(first.getStartTime());
-                    }
-                    if (last.getStartTime() == null) {
-                        last.setStartTime(last.getArriveTime());
-                    }
-                    if (last.getStartDayDiff() > first.getArriveDayDiff()
-                            || (last.getStartTime().after(first.getArriveTime())
-                            && last.getStartDayDiff() >= first.getArriveDayDiff())) {
-                        LocalTime lastTime = last.getStartTime().toLocalTime();
-                        LocalTime firstTime = first.getArriveTime().toLocalTime();
-                        //如果后一辆换乘列车需要等待的时间大于1小时,或者换乘时间小于5分钟,不加入此换乘计划
-                        if (lastTime.minusHours(2).isAfter(firstTime) || lastTime.minusMinutes(5).isBefore(firstTime)) {
-                            continue;
-                        }
-                        //当天的车辆如果已经发车,不进行添加
-                        if (LocalDate.now().toString().equals(date)) {
-                            if (first.getStartTime().toLocalTime().isBefore(LocalTime.now())) {
-                                continue;
-                            }
-                        }
-                        ChangeTrain changeTrain = new ChangeTrain();
-                        changeTrain.setChangeStation(station);
 
-                        changeTrain.setFirstTrainCode(first.getTrainCode());
-                        Train firstTrain = trainMapper.selectTrainByTrainCode(first.getTrainCode());
-                        firstTrain.setNowStartStationTelecode(startStationTelecode);
-                        firstTrain.setNowEndStationTelecode(station);
-                        firstTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(first.getTrainCode()));
-                        changeTrain.setFirstTrain(firstTrain);
-
-                        changeTrain.setLastTrainCode(last.getTrainCode());
-                        Train lastTrain = trainMapper.selectTrainByTrainCode(last.getTrainCode());
-                        lastTrain.setNowStartStationTelecode(station);
-                        lastTrain.setNowEndStationTelecode(endStationTelecode);
-                        lastTrain.setTrainStations(stationTrainMapper.selectStationTrainByStationTrainCode(last.getTrainCode()));
-                        changeTrain.setLastTrain(lastTrain);
-
-                        changeTrain.setFirstTrainArriveTime(first.getArriveTime());
-                        changeTrain.setLastTrainStartTime(last.getStartTime());
-                        if (last.getStartDayDiff() > first.getArriveDayDiff()) {
-                            changeTrain.setInterval(24 * 60 + lastTime.getMinute() + lastTime.getHour() * 60 - firstTime.getMinute() - firstTime.getHour() * 60);
-                        } else {
-                            changeTrain.setInterval(lastTime.getMinute() + lastTime.getHour() * 60 - firstTime.getMinute() - firstTime.getHour() * 60);
-                        }
-                        boolean shouldAdd = true;
-                        for (ChangeTrain c : changeTrains) {
-                            if (c.getFirstTrainCode().equals(changeTrain.getFirstTrainCode())
-                                    && c.getLastTrainCode().equals(changeTrain.getLastTrainCode())) {
-                                shouldAdd = false;
-                                break;
-                            }
-                        }
-                        if (shouldAdd) {
-                            changeTrains.add(changeTrain);
-                        }
+                    // 换乘中转时间控制在20min-4h以内
+                    LocalTime firstArriveTime = first.getArriveTime().toLocalTime();
+                    LocalTime lastStartTime = last.getStartTime().toLocalTime();
+                    int interval = (int) firstArriveTime.until(lastStartTime, ChronoUnit.MINUTES);
+                    // 这里添加20min有可能跳到第二天,所以先判断是不是在后面
+                    if (interval < 20 || interval > 240) {
+                        continue;
                     }
+
+                    LocalTime startTime = firstTrainStartTime.get(first.getTrainCode()).getTime().toLocalTime();
+                    LocalTime arriveTime = lastTrainArriveTime.get(last.getTrainCode()).getTime().toLocalTime();
+                    //排除辆车相遇的车站在出发车站以前,或在终点车站以后的情况
+                    if (startTime.isAfter(firstArriveTime) || arriveTime.isBefore(lastStartTime)) {
+                        continue;
+                    }
+
+                    ChangeTrain changeTrain = new ChangeTrain();
+                    changeTrain.setFirstTrainCode(first.getTrainCode());
+                    changeTrain.setFirstTrainArriveTime(first.getArriveTime());
+                    changeTrain.setLastTrainCode(last.getTrainCode());
+                    changeTrain.setLastTrainStartTime(last.getStartTime());
+
+                    changeTrain.setChangeStation(first.getStationTelecode());
+                    changeTrain.setInterval(interval);
+
+                    changeTrain.setLength((int) startTime.until(arriveTime, ChronoUnit.MINUTES));
+                    changeTrain.setLength(changeTrain.getLength()
+                            + 24 * 60 * (lastTrainArriveTime.get(last.getTrainCode()).getDay() - firstTrainStartTime.get(first.getTrainCode()).getDay()));
+
+                    Map.Entry<String, String> pair = new AbstractMap.SimpleEntry<>(first.getTrainCode(), last.getTrainCode());
+                    if (containedTrainPair.contains(pair)) {
+                        continue;
+                    }
+                    containedTrainPair.add(pair);
+                    changeTrains.add(changeTrain);
+
+                    // 添加过之后放进已添加查重
+                    containedTrainPair.add(pair);
                 }
             }
         }
-        return changeTrains;
+
+        changeTrains.sort(Comparator.comparing(ChangeTrain::getLength));
+        return changeTrains.subList(0, Math.min(changeTrains.size(), systemSetting.getMaxTransferCalculate()));
     }
 
     public List<TrainPrice> trainPrice(String startTelecode, String endTelecode, String stationTrainCode) {
@@ -292,9 +306,9 @@ public class TrainService {
     }
 
     @Transactional
-    public boolean deleteTrainStation(String stationTrainCode, String stationTelecode, int stationNo) {
+    public boolean deleteTrainStation(String stationTrainCode, String stationTelecode) {
         List<Integer> stationNos = stationTrainMapper.selectStationNos(stationTrainCode);
-        List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
+        List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByTrainCode(stationTrainCode);
         if (stationNos.size() <= 2) {
             return false;
         }
@@ -311,7 +325,7 @@ public class TrainService {
 
     @Transactional
     public boolean addTrainStation(String stationTrainCode, String stationTelecode, int stationNo, String arriveTime, String startTime, Integer startDayDiff, Integer arriveDayDiff) {
-        List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStationTrainCode(stationTrainCode);
+        List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByTrainCode(stationTrainCode);
         for (int i = 0; i < stationTrains.size() - 1; i++) {
             if (stationTrains.get(i).getStationNo() < stationNo && stationTrains.get(i + 1).getStationNo() > stationNo) {
                 StationTrain stationTrain = new StationTrain();

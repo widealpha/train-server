@@ -1,12 +1,12 @@
 package cn.widealpha.train.service;
 
-import cn.widealpha.train.bean.StatusCode;
+import cn.widealpha.train.util.StatusCode;
 import cn.widealpha.train.dao.RoleMapper;
 import cn.widealpha.train.dao.UserInfoMapper;
 import cn.widealpha.train.dao.UserMapper;
-import cn.widealpha.train.domain.TrainUser;
-import cn.widealpha.train.domain.User;
-import cn.widealpha.train.domain.UserInfo;
+import cn.widealpha.train.pojo.entity.TrainUser;
+import cn.widealpha.train.pojo.entity.User;
+import cn.widealpha.train.pojo.entity.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.GrantedAuthority;

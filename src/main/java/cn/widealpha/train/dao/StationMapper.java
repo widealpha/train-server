@@ -1,6 +1,6 @@
 package cn.widealpha.train.dao;
 
-import cn.widealpha.train.domain.Station;
+import cn.widealpha.train.pojo.entity.Station;
 import cn.widealpha.train.util.MybatisExtendedLanguageDriver;
 import org.apache.ibatis.annotations.*;
 

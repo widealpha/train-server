@@ -2,8 +2,8 @@ package cn.widealpha.train.service;
 
 import cn.widealpha.train.dao.PassengerMapper;
 import cn.widealpha.train.dao.UserInfoMapper;
-import cn.widealpha.train.domain.Passenger;
-import cn.widealpha.train.domain.UserInfo;
+import cn.widealpha.train.pojo.entity.Passenger;
+import cn.widealpha.train.pojo.entity.UserInfo;
 import cn.widealpha.train.util.ObjectUtil;
 import cn.widealpha.train.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
