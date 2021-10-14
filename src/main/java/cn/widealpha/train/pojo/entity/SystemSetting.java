@@ -7,6 +7,7 @@ public class SystemSetting {
   private Integer start;
   private java.sql.Time updateTime;
   private Integer maxTransferCalculate;
+  private boolean hasAliPayKey;
 
 
   public Integer getId() {
@@ -44,4 +45,11 @@ public class SystemSetting {
     this.maxTransferCalculate = maxTransferCalculate;
   }
 
+  public boolean isHasAliPayKey() {
+    return hasAliPayKey;
+  }
+
+  public void setHasAliPayKey(boolean hasAliPayKey) {
+    this.hasAliPayKey = hasAliPayKey;
+  }
 }

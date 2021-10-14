@@ -104,7 +104,7 @@ public class OrderFormService {
         StringBuilder s = new StringBuilder();
         for (Ticket ticket : tickets) {
             List<Station> stationNames = stationMapper.selectStationsByTelecode(Arrays.asList(ticket.getStartStationTelecode(), ticket.getEndStationTelecode()));
-            s.append(ticket.getStationTrainCode()).append(":").append(stationNames.get(0).getName()).append("->").append(stationNames.get(1).getName());
+            s.append(ticket.getTrainCode()).append(":").append(stationNames.get(0).getName()).append("->").append(stationNames.get(1).getName());
             s.append('\n');
         }
         model.setSubject(s.toString());
@@ -214,7 +214,7 @@ public class OrderFormService {
         for (OrderForm orderForm : orderForms) {
             List<Ticket> tickets = ticketMapper.selectTicketByOrderFormId(orderForm.getOrderId());
             for (Ticket ticket : tickets) {
-                Train train = trainMapper.selectTrainByTrainCode(ticket.getStationTrainCode());
+                Train train = trainMapper.selectTrainByTrainCode(ticket.getTrainCode());
                 if (sealMap.containsKey(train.getTrainClassCode())){
                     sealMap.put(train.getTrainClassCode(), sealMap.get(train.getTrainClassCode()) + 1);
                 } else {

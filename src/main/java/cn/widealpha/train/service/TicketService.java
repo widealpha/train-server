@@ -219,7 +219,7 @@ public class TicketService {
                     ticket.setCoachId(coach.getCoachId());
                     ticket.setStartStationTelecode(stationTrains.get(0).getStationTelecode());
                     ticket.setEndStationTelecode(lastStationTrain.getStationTelecode());
-                    ticket.setStationTrainCode(stationTrainCode);
+                    ticket.setTrainCode(stationTrainCode);
                     ticket.setSeat(BigInteger.ZERO.setBit(bitPlace));
                     ticket.setStartTime(timeToTimeStamp(date, stationTrains.get(0).getStartTime()));
                     ticket.setEndTime(timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime()));
@@ -268,7 +268,7 @@ public class TicketService {
                 ticket.setCoachId(coach.getCoachId());
                 ticket.setStartStationTelecode(stationTrains.get(0).getStationTelecode());
                 ticket.setEndStationTelecode(lastStationTrain.getStationTelecode());
-                ticket.setStationTrainCode(stationTrainCode);
+                ticket.setTrainCode(stationTrainCode);
                 ticket.setSeat(BigInteger.ZERO.setBit(bitPlace));
                 ticket.setStartTime(timeToTimeStamp(date, stationTrains.get(0).getStartTime()));
                 ticket.setEndTime(timeToTimeStamp(date, stationTrains.get(stationTrains.size() - 1).getArriveTime()));
@@ -292,7 +292,7 @@ public class TicketService {
                 return StatusCode.NO_PERMISSION;
             }
             List<StationTrain> stationTrains = stationTrainMapper.selectStationTrainByStartEndCode(
-                    ticket.getStartStationTelecode(), ticket.getEndStationTelecode(), ticket.getStationTrainCode());
+                    ticket.getStartStationTelecode(), ticket.getEndStationTelecode(), ticket.getTrainCode());
             StationTrain lastStationTrain = stationTrains.get(0);
             //对两个相邻站台遍历,取出seat信息
             for (int i = 1; i < stationTrains.size(); i++) {

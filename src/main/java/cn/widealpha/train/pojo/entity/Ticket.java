@@ -6,7 +6,7 @@ public class Ticket {
     private Integer ticketId;
     private Integer coachId;
     private BigInteger seat;
-    private String stationTrainCode;
+    private String trainCode;
     private String startStationTelecode;
     private String endStationTelecode;
     private java.sql.Timestamp startTime;
@@ -41,12 +41,12 @@ public class Ticket {
         this.seat = seat;
     }
 
-    public String getStationTrainCode() {
-        return stationTrainCode;
+    public String getTrainCode() {
+        return trainCode;
     }
 
-    public void setStationTrainCode(String stationTrainCode) {
-        this.stationTrainCode = stationTrainCode;
+    public void setTrainCode(String trainCode) {
+        this.trainCode = trainCode;
     }
 
 
